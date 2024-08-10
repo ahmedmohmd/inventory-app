@@ -14,7 +14,7 @@
 		"prepare": "husky"
 	},
 	"lint-staged": {
-		"*.{js,ts,tsx}": [
+		"*.{js,ts}": [
 			"eslint --quiet --fix"
 		],
 		"*.{json,js,ts}": [
