@@ -11,7 +11,10 @@
 		"test:run": "vitest",
 		"test:coverage": "vitest run --coverage",
 		"test:preview": "npx vite preview --outDir html",
-		"prepare": "husky"
+		"prepare": "husky",
+		"update:check": "npm-check --skip-unused ",
+		"update:run": "npm-check --update --skip-unused",
+		"check-unused-pkgs": "depcheck"
 	},
 	"lint-staged": {
 		"*.{js,ts}": [
