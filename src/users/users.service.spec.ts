@@ -1,6 +1,6 @@
 import createHttpError from "http-errors";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { User } from "./users.repository";
+import usersRepository from "./users.repository";
 import {
 	findAllUsers,
 	findUserById,
@@ -45,7 +45,7 @@ vi.mock("../logging", () => ({
 }));
 
 vi.mock("./users.repository.ts", () => ({
-	User: {
+	default: {
 		findAllUsers: vi.fn(() => new Promise((resolve) => resolve([]))),
 		findUserById: vi.fn(
 			(id: number) =>
@@ -113,7 +113,7 @@ describe("findUsers", () => {
 describe("findUserById()", () => {
 	it("Should throw Error if User not Found.", async () => {
 		const findUserByIdSpy = vi
-			.spyOn(User, "findUserById")
+			.spyOn(usersRepository, "findUserById")
 			.mockResolvedValue(undefined);
 
 		const id = 1;
@@ -132,7 +132,7 @@ describe("findUserById()", () => {
 
 		const targetUser = await findUserById(id);
 
-		expect(User.findUserById).toBeCalledWith(id);
+		expect(usersRepository.findUserById).toBeCalledWith(id);
 		expect(targetUser).toEqual(fakeUser);
 	});
 });

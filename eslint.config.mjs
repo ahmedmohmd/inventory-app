@@ -26,7 +26,7 @@ export default [
 			"no-self-compare": ["warn"],
 
 			"accessor-pairs": ["warn"],
-			"arrow-body-style": ["warn", "as-needed"],
+			// "arrow-body-style": ["warn", "as-needed"],
 			"block-scoped-var": ["warn"],
 			"camelcase": ["warn", { properties: "never" }],
 			"class-methods-use-this": ["warn"],
