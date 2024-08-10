@@ -1,0 +1,9 @@
+{
+	"watch": ["."],
+	"ext": "js,json,ts",
+	"ignore": ["src/**/*.test.js"],
+	"env": {
+		"NODE_ENV": "development"
+	},
+	"verbose": true
+}

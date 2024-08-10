@@ -1,0 +1,7 @@
+const INTERNAL_SERVER_STATUS_CODE = 500;
+
+enum HttpStatusCode {
+	INTERNAL_SERVER_ERROR = INTERNAL_SERVER_STATUS_CODE,
+}
+
+export { HttpStatusCode };
