@@ -15,8 +15,6 @@ vi.mock("./users.service", () => ({
 	deleteUser: vi.fn(() => Promise.resolve({})),
 }));
 
-// vi.mock("re")
-
 let fakeRequest = {} as Request;
 let fakeResponse = {} as Response;
 let fakeNextFunction = vi.fn() as NextFunction;
@@ -30,6 +28,7 @@ beforeEach(() => {
 describe("getAllUsers()", () => {
 	it("Should call findAllUsers() and json() methods", async () => {
 		fakeResponse.json = vi.fn();
+		fakeResponse.status = vi.fn(() => fakeResponse);
 
 		await getAllUsers(fakeRequest, fakeResponse, fakeNextFunction);
 
@@ -41,6 +40,7 @@ describe("getAllUsers()", () => {
 describe("getSingleUser()", () => {
 	it("Should call findUserById() and json() methods", async () => {
 		fakeResponse.json = vi.fn();
+		fakeResponse.status = vi.fn(() => fakeResponse);
 		fakeRequest.params = {
 			id: "1",
 		};
@@ -58,11 +58,12 @@ describe("updateUser()", () => {
 			name: "Ahmed",
 		};
 
-		fakeResponse.json = vi.fn();
 		fakeRequest.params = {
 			id: "1",
 		};
 		fakeRequest.body = userData;
+		fakeResponse.json = vi.fn();
+		fakeResponse.status = vi.fn(() => fakeResponse);
 
 		await updateUser(fakeRequest, fakeResponse, fakeNextFunction);
 

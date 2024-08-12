@@ -13,7 +13,7 @@ import { UpdateUser } from "./users.types";
 const getAllUsers: RequestHandler = async (req, res) => {
 	const allUsers = await usersService.findAllUsers();
 
-	res.json(allUsers);
+	res.status(HttpStatusCode.OK).json(allUsers);
 };
 
 /**
@@ -28,7 +28,7 @@ const getSingleUser: RequestHandler = async (req, res) => {
 
 	const targetUser = await usersService.findUserById(Number(id));
 
-	res.json(targetUser);
+	res.status(HttpStatusCode.OK).json(targetUser);
 };
 
 /**
@@ -44,7 +44,7 @@ const updateUser: RequestHandler = async (req, res) => {
 
 	await usersService.updateUser(Number(id), userData);
 
-	res.json(true);
+	res.status(HttpStatusCode.CREATED).json(true);
 };
 
 /**

@@ -21,12 +21,19 @@ router.get(
 	getAllUsers
 );
 
-router.get("/:id", validateRequestParams(userIdSchema), getSingleUser);
+router.get(
+	"/:id",
+	authenticate,
+	authUserRoles(Role.ADMIN, Role.ROOT),
+	validateRequestParams(userIdSchema),
+	getSingleUser
+);
 
 router.patch(
 	"/:id",
 	authenticate,
 	validateRequestParams(userIdSchema),
+	authUserRoles(Role.ADMIN, Role.ROOT),
 	validateRequestBody(updateUserSchema),
 	updateUser
 );
@@ -34,6 +41,7 @@ router.patch(
 router.delete(
 	"/:id",
 	authenticate,
+	authUserRoles(Role.ADMIN, Role.ROOT),
 	validateRequestParams(userIdSchema),
 	deleteUser
 );
