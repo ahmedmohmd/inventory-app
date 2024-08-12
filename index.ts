@@ -5,7 +5,7 @@ import { ENV } from "./config/env";
 import bootstrap from "./src/bootstrap";
 import { connectToDatabase } from "./src/db";
 import logger from "./src/logging";
-import { findAllUsers, insertUser } from "./src/users/users.service";
+// import { findAllUsers, insertUser } from "./src/users/users.service";
 
 const app = express();
 app.use(express.json());
@@ -16,18 +16,18 @@ bootstrap.handleCors(app);
 bootstrap.handleSecurity(app);
 bootstrap.handleRateLimiting(app);
 
-app.get("/", async (req, res) => {
-	const user = {
-		name: "Ahmed",
-		email: "ahmed@gmail.com",
-		password: "12345",
-	};
+// app.get("/", async (req, res) => {
+// 	const user = {
+// 		name: "Ahmed",
+// 		email: "ahmed@gmail.com",
+// 		password: "12345",
+// 	};
 
-	await insertUser(user);
+// 	await insertUser(user);
 
-	const users = await findAllUsers();
-	res.send(users);
-});
+// 	const users = await findAllUsers();
+// 	res.send(users);
+// });
 
 // All App Routes
 bootstrap.handleRoutes(app);

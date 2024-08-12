@@ -20,11 +20,25 @@ const findAllUsers = async () => {
 };
 
 const insertUser = async (userData: CreateUser) => {
-	return await db.insert(users).values(userData);
+	return await db.insert(users).values(userData).returning({
+		id: users.id,
+		name: users.name,
+		email: users.email,
+		password: users.password,
+		createdAt: users.createdAt,
+		updatedAt: users.updatedAt,
+	});
 };
 
 const updateUser = async (id: number, userData: UpdateUser) => {
-	return await db.update(users).set(userData);
+	for (const field of Object.keys(userData)) {
+		// eslint-disable-next-line
+		await db
+			.update(users)
+			.set({ [field]: userData[field as keyof UpdateUser] });
+	}
+
+	return;
 };
 
 const deleteUser = async (id: number) => {

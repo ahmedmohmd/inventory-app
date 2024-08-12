@@ -13,7 +13,7 @@ export const userRole = pgEnum("role", ["admin", "moderator", "user"]);
 export const users = pgTable(
 	"users",
 	{
-		id: serial("id").primaryKey().notNull(),
+		id: serial("id").primaryKey(),
 		name: varchar("name", {
 			length: 25,
 		}).notNull(),
@@ -23,10 +23,11 @@ export const users = pgTable(
 			.notNull()
 			.unique(),
 		password: varchar("password", {
-			length: 50,
+			length: 72,
 		}).notNull(),
-		createdAt: timestamp("createdAt").defaultNow(),
+		createdAt: timestamp("createdAt").notNull().defaultNow(),
 		updatedAt: timestamp("updatedAt")
+			.notNull()
 			.defaultNow()
 			.$onUpdate(() => new Date()),
 	},

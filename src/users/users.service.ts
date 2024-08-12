@@ -1,4 +1,5 @@
 import createHttpError from "http-errors";
+import { hashPassword } from "../auth/utils/password-hash.util";
 import logger from "../logging";
 import usersRepository from "./users.repository";
 import { CreateUser, UpdateUser } from "./users.types";
@@ -20,10 +21,10 @@ const findAllUsers = async () => {
 	return await usersRepository.findAllUsers();
 };
 
-const insertUser = async (userdata: CreateUser) => {
+const insertUser = async (userData: CreateUser) => {
 	logger.general.info(`Calling for insertUser() Method from Users Service.`);
 
-	const targetUser = await usersRepository.findUserByEmail(userdata.email);
+	const targetUser = await usersRepository.findUserByEmail(userData.email);
 
 	if (targetUser) {
 		logger.errors.error(
@@ -34,7 +35,9 @@ const insertUser = async (userdata: CreateUser) => {
 		);
 	}
 
-	const createdUser = await usersRepository.insertUser(userdata);
+	userData.password = await hashPassword(userData.password);
+
+	const createdUser = await usersRepository.insertUser(userData);
 
 	return createdUser;
 };
@@ -46,6 +49,10 @@ const updateUser = async (id: number, userData: UpdateUser) => {
 	if (!targetUser) {
 		logger.errors.error(`User with Id: ${id} not Found Exception.`);
 		throw new createHttpError.NotFound(`User with Id: ${id} not Found.`);
+	}
+
+	if (userData.password) {
+		userData.password = await hashPassword(userData.password);
 	}
 
 	await usersRepository.updateUser(id, userData);

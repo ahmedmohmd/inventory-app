@@ -15,6 +15,20 @@
 			"when": 1723280560637,
 			"tag": "0001_puzzling_tomas",
 			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "7",
+			"when": 1723479348101,
+			"tag": "0002_needy_luminals",
+			"breakpoints": true
+		},
+		{
+			"idx": 3,
+			"version": "7",
+			"when": 1723481019086,
+			"tag": "0003_quiet_gladiator",
+			"breakpoints": true
 		}
 	]
 }
