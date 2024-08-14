@@ -1,6 +1,6 @@
 import type { ErrorRequestHandler } from "express";
 import createHttpError from "http-errors";
-import { HttpStatusCode } from "../common/enums/http-status-code.tnum";
+import { HttpStatusCode } from "../common/enums/http-status-code.enum";
 import logger from "../logging";
 
 // eslint-disable-next-line

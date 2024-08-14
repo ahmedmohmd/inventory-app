@@ -13,7 +13,7 @@ describe("hashPassword", () => {
 
 	it("Should call hash method.", () => {
 		const fakePassword = "fake-password";
-		const hashMethodSpy = vi.spyOn(bcrypt, "hashSync");
+		const hashMethodSpy = vi.spyOn(bcrypt, "hash");
 
 		hashPassword(fakePassword);
 
@@ -22,19 +22,19 @@ describe("hashPassword", () => {
 });
 
 describe("checkPassword()", () => {
-	it("Should return false if any param is empty.", () => {
+	it("Should return false if any param is empty.", async () => {
 		const fakePassword = "";
 		const hashedFakePassword = "";
 		const expectedResult = false;
-		const actualResult = checkPassword(fakePassword, hashedFakePassword);
+		const actualResult = await checkPassword(fakePassword, hashedFakePassword);
 
 		expect(actualResult).toBe(expectedResult);
 	});
 
 	it("Should call compare() method if params are correct.", () => {
-		const fakePassword = "";
-		const hashedFakePassword = "";
-		const compareSyncMethodSpy = vi.spyOn(bcrypt, "compareSync");
+		const fakePassword = "111";
+		const hashedFakePassword = "sdfsdfsdfsdf";
+		const compareSyncMethodSpy = vi.spyOn(bcrypt, "compare");
 
 		checkPassword(fakePassword, hashedFakePassword);
 

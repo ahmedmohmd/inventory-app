@@ -23,6 +23,17 @@ const findUserById = async (id: number) => {
 };
 
 /**
+ * Retrieves a user from the database by their email address.
+ *
+ * @param {string} email - The email address of the user to retrieve.
+ * @return {Promise<User>} The user object if found, or undefined if not found.
+ */
+const findUserByEmail = async (email: string) => {
+	logger.general.info(`Calling for findUserByEmail() Method.`);
+	return await usersRepository.findUserByEmail(email);
+};
+
+/**
  * Retrieves all users.
  *
  * @return {array} An array of user objects.
@@ -104,4 +115,11 @@ const deleteUser = async (id: number) => {
 	return true;
 };
 
-export { deleteUser, findAllUsers, findUserById, insertUser, updateUser };
+export {
+	deleteUser,
+	findAllUsers,
+	findUserByEmail,
+	findUserById,
+	insertUser,
+	updateUser,
+};

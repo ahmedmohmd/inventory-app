@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { HttpStatusCode } from "../common/enums/http-status-code.tnum";
+import { HttpStatusCode } from "../common/enums/http-status-code.enum";
 import * as usersService from "./users.service";
 import { UpdateUser } from "./users.types";
 

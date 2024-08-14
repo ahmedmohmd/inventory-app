@@ -7,15 +7,29 @@ const hashPassword = (password: string) => {
 		return "";
 	}
 
-	return bcrypt.hashSync(password, HASH_SALT);
+	return new Promise((resolve, reject) => {
+		bcrypt.hash(password, HASH_SALT, (err, hash) => {
+			if (err) {
+				reject(err);
+			}
+			resolve(hash);
+		});
+	});
 };
 
 const checkPassword = (plainTextPassword: string, hashedPassword: string) => {
-	if (!hashPassword || plainTextPassword) {
+	if (!hashPassword || !plainTextPassword) {
 		return false;
 	}
 
-	return bcrypt.compareSync(plainTextPassword, hashedPassword);
+	return new Promise((resolve, reject) => {
+		bcrypt.compare(plainTextPassword, hashedPassword, (err, same) => {
+			if (err) {
+				reject(err);
+			}
+			resolve(same);
+		});
+	});
 };
 
 export { checkPassword, hashPassword };

@@ -1,7 +1,18 @@
 import request from "supertest";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { app } from "../..";
-import { HttpStatusCode } from "../common/enums/http-status-code.tnum";
+import { HttpStatusCode } from "../common/enums/http-status-code.enum";
+
+vi.mock("../logging", () => ({
+	default: {
+		general: {
+			info: vi.fn(),
+		},
+		errors: {
+			error: vi.fn(),
+		},
+	},
+}));
 
 describe("Get all users route", () => {
 	it("should get 401 status code", async () => {
