@@ -1,5 +1,6 @@
 import createHttpError from "http-errors";
 import { describe, expect, it, vi } from "vitest";
+import { Role } from "../common/enums/user-role.enum";
 import { login, register } from "./auth.service";
 
 const fakeUser = {
@@ -7,6 +8,7 @@ const fakeUser = {
 	name: "Ahmed",
 	email: "ahmed@gmail.com",
 	password: "$2b$10$SRVtrp567O2IYV21s2tc3elz5ME8ItgGhvTo4QjCj1/kpvtj48n4.",
+	role: Role.ADMIN,
 };
 
 vi.mock("../logging", () => ({
@@ -39,12 +41,14 @@ const fakeUsers = [
 		name: "Ahmed",
 		email: "ahmed@gmail.com",
 		password: "$2b$10$SRVtrp567O2IYV21s2tc3elz5ME8ItgGhvTo4QjCj1/kpvtj48n4.",
+		role: Role.ADMIN,
 	},
 	{
 		id: 2,
 		name: "Khaled",
 		email: "khaled@gmail.com",
 		password: "$2b$10$SRVtrp567O2IYV21s2tc3elz5ME8ItgGhvTo4QjCj1/kpvtj48n4.",
+		role: Role.ADMIN,
 	},
 ];
 
@@ -87,10 +91,12 @@ describe("register", () => {
 			name: "Ahmed Muhammad",
 			email: "ahmed@gmail.com",
 			password: "12345",
+			role: Role.ADMIN,
 		};
+		const expectedResult = { token: "fake-token" };
 
 		const actualResult = await register(fakeUserData);
 
-		expect(actualResult).toEqual(fakeUser);
+		expect(actualResult).toEqual(expectedResult);
 	});
 });

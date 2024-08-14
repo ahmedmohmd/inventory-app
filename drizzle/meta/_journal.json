@@ -36,6 +36,13 @@
 			"when": 1723619733764,
 			"tag": "0004_late_whizzer",
 			"breakpoints": true
+		},
+		{
+			"idx": 5,
+			"version": "7",
+			"when": 1723621579679,
+			"tag": "0005_many_mister_fear",
+			"breakpoints": true
 		}
 	]
 }

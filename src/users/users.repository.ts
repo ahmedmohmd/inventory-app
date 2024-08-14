@@ -43,14 +43,17 @@ const findAllUsers = async () => {
  * @return {Promise<User>} The newly inserted user object.
  */
 const insertUser = async (userData: CreateUser) => {
-	return await db.insert(users).values(userData).returning({
+	const createdUser = await db.insert(users).values(userData).returning({
 		id: users.id,
 		name: users.name,
 		email: users.email,
 		password: users.password,
+		role: users.role,
 		createdAt: users.createdAt,
 		updatedAt: users.updatedAt,
 	});
+
+	return createdUser[0];
 };
 
 /**

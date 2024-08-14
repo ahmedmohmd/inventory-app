@@ -16,19 +16,6 @@ bootstrap.handleCors(app);
 bootstrap.handleSecurity(app);
 bootstrap.handleRateLimiting(app);
 
-// app.get("/", async (req, res) => {
-// 	const user = {
-// 		name: "Ahmed",
-// 		email: "ahmed@gmail.com",
-// 		password: "12345",
-// 	};
-
-// 	await insertUser(user);
-
-// 	const users = await findAllUsers();
-// 	res.send(users);
-// });
-
 // All App Routes
 bootstrap.handleRoutes(app);
 

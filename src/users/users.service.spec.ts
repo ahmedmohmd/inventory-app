@@ -14,6 +14,7 @@ interface FakeUser {
 	name: string;
 	email: string;
 	password: string;
+	role: string;
 }
 
 let fakeUser: Partial<FakeUser> = {};
@@ -24,12 +25,14 @@ let fakeUsers: FakeUser[] = [
 		name: "Ahmed",
 		email: "ahmed@gmail.com",
 		password: "12345",
+		role: "admin",
 	},
 	{
 		id: 2,
 		name: "Khaled",
 		email: "khaled@gmail.com",
 		password: "12345",
+		role: "admin",
 	},
 ];
 
@@ -97,6 +100,7 @@ beforeEach(() => {
 		name: "Ahmed",
 		email: "ahmed@gmail.com",
 		password: "12345",
+		role: "admin",
 	};
 
 	vi.clearAllMocks();

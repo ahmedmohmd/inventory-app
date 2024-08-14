@@ -47,7 +47,8 @@ const findAllUsers = async () => {
  * Inserts a new user into the database.
  *
  * @param {CreateUser} userData - The data for the new user to be inserted.
- * @return {object} The newly inserted user object.
+ * @return {Promise<User>} The newly inserted user object.
+ * @throws {BadRequest} If a user with the same email already exists.
  */
 const insertUser = async (userData: CreateUser) => {
 	logger.general.info(`Calling for insertUser() Method from Users Service.`);
@@ -63,7 +64,9 @@ const insertUser = async (userData: CreateUser) => {
 		);
 	}
 
-	userData.password = await hashPassword(userData.password);
+	Object.assign(userData, {
+		password: await hashPassword(userData.password),
+	});
 
 	const createdUser = await usersRepository.insertUser(userData);
 
@@ -86,9 +89,9 @@ const updateUser = async (id: number, userData: UpdateUser) => {
 		throw new createHttpError.NotFound(`User with Id: ${id} not Found.`);
 	}
 
-	if (userData.password) {
-		userData.password = await hashPassword(userData.password);
-	}
+	Object.assign(userData, {
+		password: await hashPassword(userData.password as string),
+	});
 
 	await usersRepository.updateUser(id, userData);
 

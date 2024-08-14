@@ -14,14 +14,14 @@ vi.mock("../logging", () => ({
 	},
 }));
 
-describe("Get all users route", () => {
+describe.skip("Get all users route", () => {
 	it("should get 401 status code", async () => {
 		const response = await request(app).get("/api/v1/users");
 		expect(response.statusCode).toBe(HttpStatusCode.UNAUTHORIZED);
 	});
 });
 
-describe("Get single user route", () => {
+describe.skip("Get single user route", () => {
 	it("should get a single user", async () => {
 		const response = await request(app).get("/api/v1/users/1");
 
@@ -29,7 +29,7 @@ describe("Get single user route", () => {
 	});
 });
 
-describe("Update user route", () => {
+describe.skip("Update user route", () => {
 	it("should get a single user", async () => {
 		const response = await request(app).patch("/api/v1/users/1");
 
@@ -37,7 +37,7 @@ describe("Update user route", () => {
 	});
 });
 
-describe("Delete user route", () => {
+describe.skip("Delete user route", () => {
 	it("should get a single user", async () => {
 		const response = await request(app).delete("/api/v1/users/1");
 

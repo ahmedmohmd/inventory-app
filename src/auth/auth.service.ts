@@ -33,19 +33,29 @@ const login = async (email: string, password: string) => {
 
 	const jwtToken = await createJwtToken({
 		id: targetUser.id,
+		role: targetUser.role,
 	});
 
 	return { token: jwtToken };
 };
 
 /**
- * Registers a new user by inserting their data into the database.
+ * Registers a new user with the provided data and returns a JSON Web Token.
  *
- * @param {CreateUser} userData - The data of the user to be registered.
- * @return {Promise<any>} A promise that resolves to the result of the insertion operation.
+ * @param {CreateUser} userData - The data for the new user.
+ * @return {Promise<{ token: string }>} A promise that resolves to an object containing the JWT token.
  */
 const register = async (userData: CreateUser) => {
-	return await insertUser(userData);
+	const createdUser = await insertUser(userData);
+
+	const jwtToken = await createJwtToken({
+		id: createdUser.id,
+		role: createdUser.role,
+	});
+
+	return {
+		token: jwtToken,
+	};
 };
 
 export { login, register };
