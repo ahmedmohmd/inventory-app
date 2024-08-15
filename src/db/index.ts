@@ -1,5 +1,7 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Client } from "pg";
+import { categories } from "./schema/category.schema";
+import { products } from "./schema/product.schema";
 import { users } from "./schema/user.schema";
 
 const client = new Client({
@@ -11,5 +13,5 @@ export async function connectToDatabase() {
 }
 
 export const db = drizzle(client, {
-	schema: { users },
+	schema: { users, categories, products },
 });
