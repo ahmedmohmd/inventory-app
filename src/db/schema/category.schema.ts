@@ -8,6 +8,12 @@ import {
 } from "drizzle-orm/pg-core";
 import { products } from "./product.schema";
 
+// export const categoryName = pgEnum("category_name", [
+// 	"pc",
+// 	"storage",
+// 	"accessories",
+// ]);
+
 export const categories = pgTable(
 	"categories",
 	{

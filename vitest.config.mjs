@@ -5,5 +5,6 @@ export default defineConfig({
 		watch: false,
 		root: ".",
 		reporters: ["html", "basic"],
+		globalSetup: "./globalSetup.ts",
 	},
 });

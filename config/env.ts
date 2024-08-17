@@ -22,6 +22,7 @@ const envSchema = z.object({
 		)
 		.optional(),
 	JWT_SECRET: z.string(),
+	DB_URL: z.string(),
 });
 
 type Env = z.infer<typeof envSchema>;

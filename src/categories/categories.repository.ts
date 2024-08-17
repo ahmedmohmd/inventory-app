@@ -25,6 +25,7 @@ const insertCategory = async (categoryData: CreateCategory) => {
 		.values(categoryData)
 		.returning({
 			id: categories.id,
+			name: categories.name,
 			description: categories.description,
 			createdAt: categories.createdAt,
 			updatedAt: categories.updatedAt,
