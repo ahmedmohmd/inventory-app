@@ -84,6 +84,12 @@ const deleteUser = async (id: number) => {
 	return await db.delete(users).where(eq(users.id, id)).execute();
 };
 
+const findUserByResetToken = async (resetToken: string) => {
+	return await db.query.users.findFirst({
+		where: eq(users.resetPasswordToken, resetToken),
+	});
+};
+
 export default {
 	deleteUser,
 	findAllUsers,
@@ -91,4 +97,5 @@ export default {
 	findUserById,
 	insertUser,
 	updateUser,
+	findUserByResetToken,
 };

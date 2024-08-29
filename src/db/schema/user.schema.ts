@@ -1,5 +1,6 @@
 import { InferInsertModel } from "drizzle-orm";
 import {
+	boolean,
 	pgEnum,
 	pgTable,
 	serial,
@@ -8,7 +9,7 @@ import {
 	varchar,
 } from "drizzle-orm/pg-core";
 
-export const userRole = pgEnum("role", ["admin", "root", "moderator"]);
+export const userRole = pgEnum("role", ["admin", "employee"]);
 
 export const users = pgTable(
 	"users",
@@ -26,6 +27,18 @@ export const users = pgTable(
 			length: 72,
 		}).notNull(),
 		role: userRole("role"),
+
+		profileImage: varchar("profileImage", {
+			length: 255,
+		}).default(""),
+		profileImagePublicId: varchar("profileImagePublicId", {
+			length: 255,
+		}).default(""),
+
+		isActive: boolean("isActive").default(false).notNull(),
+
+		resetPasswordToken: varchar("resetPasswordToken").default(""),
+
 		createdAt: timestamp("createdAt").notNull().defaultNow(),
 		updatedAt: timestamp("updatedAt")
 			.notNull()

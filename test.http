@@ -1,0 +1,22 @@
+# Suppliers
+GET http://localhost:5000/api/v1/suppliers
+
+###
+
+GET http://localhost:5000/api/v1/suppliers/1
+
+###
+
+POST http://localhost:5000/api/v1/suppliers
+Content-Type: application/json
+
+{
+  "name": "supplier 2",
+  "email": "supplier2@example.com",
+  "address": "qina",
+  "phone": "123"
+}
+
+###
+
+DELETE http://localhost:5000/api/v1/suppliers/1

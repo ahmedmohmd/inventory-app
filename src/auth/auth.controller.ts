@@ -1,6 +1,11 @@
 import { RequestHandler } from "express";
 import { HttpStatusCode } from "../common/enums/http-status-code.enum";
-import { login, register } from "./auth.service";
+import {
+	login,
+	register,
+	resetPassword,
+	resetPasswordRequest,
+} from "./auth.service";
 
 /**
  * Handles user registration by validating credentials and returning a JSON Web Token.
@@ -9,8 +14,8 @@ import { login, register } from "./auth.service";
  * @param {object} res - Response object.
  * @return {Promise<void>} Resolves with a JSON response containing the JWT token.
  */
-const registerHandler: RequestHandler = async ({ body }, res) => {
-	const jwtToken = await register(body);
+const registerHandler: RequestHandler = async ({ body, file }, res) => {
+	const jwtToken = await register(body, file as Express.Multer.File);
 
 	res.status(HttpStatusCode.CREATED).json(jwtToken);
 };
@@ -28,4 +33,28 @@ const loginHandler: RequestHandler = async ({ body }, res) => {
 	res.status(HttpStatusCode.OK).json(jwtToken);
 };
 
-export { loginHandler, registerHandler };
+const resetPasswordRequestHandler: RequestHandler = async ({ body }, res) => {
+	const result = await resetPasswordRequest(body.email);
+
+	res.status(HttpStatusCode.OK).send(result);
+};
+
+const resetPasswordHandler: RequestHandler = async ({ body, query }, res) => {
+	const result = await resetPassword(
+		(
+			query as {
+				resetToken: string;
+			}
+		).resetToken,
+		body.password
+	);
+
+	res.status(HttpStatusCode.OK).send(result);
+};
+
+export {
+	loginHandler,
+	registerHandler,
+	resetPasswordHandler,
+	resetPasswordRequestHandler,
+};

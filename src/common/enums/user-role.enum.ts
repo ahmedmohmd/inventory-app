@@ -1,7 +1,6 @@
 enum Role {
-	ROOT = "root",
 	ADMIN = "admin",
-	MODERATOR = "moderator",
+	EMPLOYEE = "employee",
 }
 
 export { Role };

@@ -21,9 +21,11 @@ export const categories = pgTable(
 		name: varchar("name", {
 			length: 25,
 		}).notNull(),
+
 		description: varchar("description", {
 			length: 255,
 		}),
+
 		createdAt: timestamp("createdAt").notNull().defaultNow(),
 		updatedAt: timestamp("updatedAt")
 			.notNull()

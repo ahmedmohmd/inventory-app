@@ -19,17 +19,12 @@ import {
 
 const router = express.Router();
 
-router.get(
-	"/",
-	authenticate,
-	authUserRoles(Role.ADMIN, Role.ROOT, Role.MODERATOR),
-	getAllCategories
-);
+router.get("/", authenticate, authUserRoles(Role.ADMIN), getAllCategories);
 
 router.get(
 	"/:id",
 	authenticate,
-	authUserRoles(Role.ADMIN, Role.ROOT, Role.MODERATOR),
+	authUserRoles(Role.ADMIN, Role.EMPLOYEE),
 	validateRequestParams(categoryIdSchema),
 	getSingleCategory
 );
@@ -37,7 +32,7 @@ router.get(
 router.post(
 	"/",
 	authenticate,
-	authUserRoles(Role.ROOT, Role.MODERATOR),
+	authUserRoles(Role.ADMIN, Role.EMPLOYEE),
 	validateRequestBody(createCategorySchema),
 	createCategory
 );
@@ -46,7 +41,7 @@ router.patch(
 	"/:id",
 	authenticate,
 	validateRequestParams(categoryIdSchema),
-	authUserRoles(Role.ROOT, Role.MODERATOR),
+	authUserRoles(Role.ADMIN, Role.EMPLOYEE),
 	validateRequestBody(updateCategorySchema),
 	updateCategory
 );
@@ -54,7 +49,7 @@ router.patch(
 router.delete(
 	"/:id",
 	authenticate,
-	authUserRoles(Role.ROOT, Role.MODERATOR),
+	authUserRoles(Role.ADMIN, Role.EMPLOYEE),
 	validateRequestParams(categoryIdSchema),
 	deleteCategory
 );

@@ -1,5 +1,6 @@
 import createHttpError from "http-errors";
 import { hashPassword } from "../auth/utils/password-hash.util";
+import { removeImage, uploadImage } from "../common/utils/image-upload";
 import logger from "../logging";
 import usersRepository from "./users.repository";
 import { CreateUser, UpdateUser } from "./users.types";
@@ -44,13 +45,16 @@ const findAllUsers = async () => {
 };
 
 /**
- * Inserts a new user into the database.
+ * Inserts a new user into the database after checking for existing users with the same email address.
  *
  * @param {CreateUser} userData - The data for the new user to be inserted.
+ * @param {Express.Multer.File} profileImage - The profile image of the new user.
  * @return {Promise<User>} The newly inserted user object.
- * @throws {BadRequest} If a user with the same email already exists.
  */
-const insertUser = async (userData: CreateUser) => {
+const insertUser = async (
+	userData: CreateUser,
+	profileImage: Express.Multer.File | null
+) => {
 	logger.general.info(`Calling for insertUser() Method from Users Service.`);
 
 	const targetUser = await usersRepository.findUserByEmail(userData.email);
@@ -64,8 +68,12 @@ const insertUser = async (userData: CreateUser) => {
 		);
 	}
 
+	const uploadedImage = await uploadImage(profileImage, "users-images");
+
 	Object.assign(userData, {
 		password: await hashPassword(userData.password),
+		profileImage: uploadedImage?.secure_url || "",
+		profileImagePublicId: uploadedImage?.public_id || "",
 	});
 
 	const createdUser = await usersRepository.insertUser(userData);
@@ -73,14 +81,11 @@ const insertUser = async (userData: CreateUser) => {
 	return createdUser;
 };
 
-/**
- * Updates an existing user in the database.
- *
- * @param {number} id - The unique identifier of the user to update.
- * @param {UpdateUser} userData - The updated data for the user.
- * @return {boolean} True if the update is successful.
- */
-const updateUser = async (id: number, userData: UpdateUser) => {
+const updateUser = async (
+	id: number,
+	userData: UpdateUser,
+	profileImage?: Express.Multer.File
+) => {
 	logger.general.info(`Calling for updateUser() Method.`);
 	const targetUser = await usersRepository.findUserById(id);
 
@@ -89,21 +94,30 @@ const updateUser = async (id: number, userData: UpdateUser) => {
 		throw new createHttpError.NotFound(`User with Id: ${id} not Found.`);
 	}
 
+	if (profileImage) {
+		await removeImage(targetUser.profileImagePublicId);
+
+		const uploadedImage = await uploadImage(profileImage, "users-images");
+
+		Object.assign(userData, {
+			profileImage: uploadedImage?.secure_url || "",
+			profileImagePublicId: uploadedImage?.public_id || "",
+		});
+	}
+
 	Object.assign(userData, {
 		password: await hashPassword(userData.password as string),
 	});
 
 	await usersRepository.updateUser(id, userData);
 
-	return true;
+	return;
 };
 
-/**
- * Deletes a user by their unique identifier.
- *
- * @param {number} id - The unique identifier of the user to delete.
- * @return {boolean} True if the deletion is successful.
- */
+const findUserByResetToken = async (resetToken: string) => {
+	return await usersRepository.findUserByResetToken(resetToken);
+};
+
 const deleteUser = async (id: number) => {
 	logger.general.info(`Calling for deleteUser() Method.`);
 	const targetUser = await usersRepository.findUserById(id);
@@ -113,9 +127,10 @@ const deleteUser = async (id: number) => {
 		throw new createHttpError.NotFound(`User with Id: ${id} not Found.`);
 	}
 
+	await removeImage(targetUser.profileImagePublicId);
 	await usersRepository.deleteUser(id);
 
-	return true;
+	return;
 };
 
 export {
@@ -123,6 +138,7 @@ export {
 	findAllUsers,
 	findUserByEmail,
 	findUserById,
+	findUserByResetToken,
 	insertUser,
 	updateUser,
 };

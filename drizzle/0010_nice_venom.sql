@@ -1,0 +1,1 @@
+ALTER TABLE "products" ADD COLUMN "sku" varchar(25) NOT NULL;

@@ -23,6 +23,28 @@ const envSchema = z.object({
 		.optional(),
 	JWT_SECRET: z.string(),
 	DB_URL: z.string(),
+	MAIL_USERNAME: z.string().email(),
+	MAIL_PASSWORD: z.string(),
+	MAIL_PORT: z.string().refine(
+		(value) => {
+			const port = parseInt(value);
+
+			const isPortNumber = !isNaN(port);
+			const GMAIL_PORT = 587;
+			const isValidPortRange = port === GMAIL_PORT;
+
+			return isPortNumber && isValidPortRange;
+		},
+		{
+			message: "Mail Port is Invalid.",
+		}
+	),
+	MAIL_HOST: z.string(),
+	SENDER_EMAIL: z.string().email(),
+
+	CLOUDINARY_CLOUD_NAME: z.string(),
+	CLOUDINARY_API_KEY: z.string(),
+	CLOUDINARY_API_SECRET: z.string(),
 });
 
 type Env = z.infer<typeof envSchema>;

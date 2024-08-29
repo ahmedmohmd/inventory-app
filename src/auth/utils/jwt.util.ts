@@ -7,8 +7,10 @@ import { ENV } from "../../../config/env";
  * @param {object} payload - The payload to be signed and encoded in the JWT.
  * @return {string} The created JWT token.
  */
-const createJwtToken = async (payload: object) => {
-	const createdJwtToken = await jwt.sign(payload, ENV.JWT_SECRET);
+const createJwtToken = async (payload: object, expiresIn?: string | number) => {
+	const createdJwtToken = await jwt.sign(payload, ENV.JWT_SECRET, {
+		expiresIn: expiresIn || "1h",
+	});
 
 	return createdJwtToken;
 };

@@ -7,6 +7,8 @@ type CreateUser = {
 	role: Role;
 };
 
-type UpdateUser = Partial<CreateUser>;
+type UpdateUser = Partial<CreateUser> & {
+	resetPasswordToken?: string;
+};
 
 export { CreateUser, UpdateUser };

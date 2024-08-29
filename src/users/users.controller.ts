@@ -40,9 +40,11 @@ const getSingleUser: RequestHandler = async (req, res) => {
  */
 const updateUser: RequestHandler = async (req, res) => {
 	const { id } = req.params;
+	const { file } = req;
+
 	const userData = req.body as UpdateUser;
 
-	await usersService.updateUser(Number(id), userData);
+	await usersService.updateUser(Number(id), userData, file);
 
 	res.status(HttpStatusCode.CREATED).json(true);
 };
