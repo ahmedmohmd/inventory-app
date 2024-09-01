@@ -10,3 +10,7 @@ export const insertOrderItem = async (data: CreateOrderItem) => {
 export const deleteOrderItem = async (id: number) => {
 	return await db.delete(orderItems).where(eq(orderItems.id, id)).execute();
 };
+
+// export const findAllOrderItems = async (orderId: number) => {
+// 	return await
+// }

@@ -8,7 +8,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { products } from "./product.schema";
 
-export const productScreenshots = pgTable("productScreenshots", {
+export const productScreenshots = pgTable("product_screenshots", {
 	id: serial("id").primaryKey(),
 	url: varchar("url", {
 		length: 255,

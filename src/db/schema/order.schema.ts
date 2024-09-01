@@ -9,21 +9,27 @@ import {
 import { orderItems } from "./order-item.schema";
 import { suppliers } from "./supplier.schema";
 
-export const OrderStatus = pgEnum("status", [
+export const OrderStatus = pgEnum("order_status", [
 	"pending",
-	"shipped",
-	"processing",
-	"cancelled",
-	"delivered",
-	"returned",
 	"completed",
+	// "pending",
+	// "shipped",
+	// "processing",
+	// "cancelled",
+	// "delivered",
+	// "returned",
+	// "completed",
 ]);
 
 export const orders = pgTable("orders", {
 	id: serial("id").primaryKey(),
-	status: OrderStatus("status").notNull(),
+	status: OrderStatus("status").default("pending").notNull(),
 	total: integer("total").notNull(),
-	supplierId: integer("supplierId").notNull(),
+	supplierId: integer("supplierId")
+		.references(() => suppliers.id, {
+			onDelete: "set null",
+		})
+		.notNull(),
 
 	createdAt: timestamp("createdAt").notNull().defaultNow(),
 	updatedAt: timestamp("updatedAt")

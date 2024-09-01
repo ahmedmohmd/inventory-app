@@ -1,6 +1,6 @@
 import request from "supertest";
 import { describe, expect, it, vi } from "vitest";
-import { app } from "../..";
+import { app } from "../../app";
 import { HttpStatusCode } from "../common/enums/http-status-code.enum";
 
 vi.mock("../logging", () => ({

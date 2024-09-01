@@ -12,7 +12,7 @@ import { sections } from "./section.schema";
 // import { stocks } from "./stock.schema";
 import { suppliers } from "./supplier.schema";
 
-export const productStatus = pgEnum("status", [
+export const productStatus = pgEnum("product_status", [
 	"reserved",
 	"in-stock",
 	"out-of-stock",

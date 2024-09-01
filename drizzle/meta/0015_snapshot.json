@@ -1,0 +1,667 @@
+{
+	"id": "6930891c-d770-46af-bdae-855702a287a7",
+	"prevId": "ea5a7d84-ca4e-4f9f-acc6-5a97ef015a88",
+	"version": "7",
+	"dialect": "postgresql",
+	"tables": {
+		"public.categories": {
+			"name": "categories",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"name": {
+					"name": "name",
+					"type": "varchar(25)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"description": {
+					"name": "description",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"createdAt": {
+					"name": "createdAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updatedAt": {
+					"name": "updatedAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {
+				"name_idx": {
+					"name": "name_idx",
+					"columns": [
+						{
+							"expression": "name",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": true,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"public.orderItems": {
+			"name": "orderItems",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"quantity": {
+					"name": "quantity",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"orderId": {
+					"name": "orderId",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"productId": {
+					"name": "productId",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"createdAt": {
+					"name": "createdAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updatedAt": {
+					"name": "updatedAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"orderItems_orderId_orders_id_fk": {
+					"name": "orderItems_orderId_orders_id_fk",
+					"tableFrom": "orderItems",
+					"tableTo": "orders",
+					"columnsFrom": ["orderId"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"orderItems_productId_products_id_fk": {
+					"name": "orderItems_productId_products_id_fk",
+					"tableFrom": "orderItems",
+					"tableTo": "products",
+					"columnsFrom": ["productId"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"public.orders": {
+			"name": "orders",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"status": {
+					"name": "status",
+					"type": "status",
+					"typeSchema": "public",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"total": {
+					"name": "total",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"supplierId": {
+					"name": "supplierId",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"createdAt": {
+					"name": "createdAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updatedAt": {
+					"name": "updatedAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"public.productScreenshots": {
+			"name": "productScreenshots",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"url": {
+					"name": "url",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"publicId": {
+					"name": "publicId",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"productId": {
+					"name": "productId",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"createdAt": {
+					"name": "createdAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updatedAt": {
+					"name": "updatedAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"productScreenshots_productId_products_id_fk": {
+					"name": "productScreenshots_productId_products_id_fk",
+					"tableFrom": "productScreenshots",
+					"tableTo": "products",
+					"columnsFrom": ["productId"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"public.products": {
+			"name": "products",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"name": {
+					"name": "name",
+					"type": "varchar(25)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"description": {
+					"name": "description",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"price": {
+					"name": "price",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"status": {
+					"name": "status",
+					"type": "status",
+					"typeSchema": "public",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"sku": {
+					"name": "sku",
+					"type": "varchar(25)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"categoryId": {
+					"name": "categoryId",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"supplierId": {
+					"name": "supplierId",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"sectionId": {
+					"name": "sectionId",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"quantity": {
+					"name": "quantity",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"createdAt": {
+					"name": "createdAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updatedAt": {
+					"name": "updatedAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"products_categoryId_categories_id_fk": {
+					"name": "products_categoryId_categories_id_fk",
+					"tableFrom": "products",
+					"tableTo": "categories",
+					"columnsFrom": ["categoryId"],
+					"columnsTo": ["id"],
+					"onDelete": "set null",
+					"onUpdate": "no action"
+				},
+				"products_supplierId_suppliers_id_fk": {
+					"name": "products_supplierId_suppliers_id_fk",
+					"tableFrom": "products",
+					"tableTo": "suppliers",
+					"columnsFrom": ["supplierId"],
+					"columnsTo": ["id"],
+					"onDelete": "set null",
+					"onUpdate": "no action"
+				},
+				"products_sectionId_sections_id_fk": {
+					"name": "products_sectionId_sections_id_fk",
+					"tableFrom": "products",
+					"tableTo": "sections",
+					"columnsFrom": ["sectionId"],
+					"columnsTo": ["id"],
+					"onDelete": "set null",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"public.sections": {
+			"name": "sections",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"name": {
+					"name": "name",
+					"type": "sectionName",
+					"typeSchema": "public",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"description": {
+					"name": "description",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"createdAt": {
+					"name": "createdAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updatedAt": {
+					"name": "updatedAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"public.stocks": {
+			"name": "stocks",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"productId": {
+					"name": "productId",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"createdAt": {
+					"name": "createdAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updatedAt": {
+					"name": "updatedAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"stocks_productId_products_id_fk": {
+					"name": "stocks_productId_products_id_fk",
+					"tableFrom": "stocks",
+					"tableTo": "products",
+					"columnsFrom": ["productId"],
+					"columnsTo": ["id"],
+					"onDelete": "set null",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"public.suppliers": {
+			"name": "suppliers",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"name": {
+					"name": "name",
+					"type": "varchar(50)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"email": {
+					"name": "email",
+					"type": "varchar(25)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"phone": {
+					"name": "phone",
+					"type": "varchar(25)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"address": {
+					"name": "address",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"createdAt": {
+					"name": "createdAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updatedAt": {
+					"name": "updatedAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		},
+		"public.users": {
+			"name": "users",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"name": {
+					"name": "name",
+					"type": "varchar(25)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"email": {
+					"name": "email",
+					"type": "varchar(25)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"password": {
+					"name": "password",
+					"type": "varchar(72)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"role": {
+					"name": "role",
+					"type": "role",
+					"typeSchema": "public",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"profileImage": {
+					"name": "profileImage",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false,
+					"default": "''"
+				},
+				"profileImagePublicId": {
+					"name": "profileImagePublicId",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": false,
+					"default": "''"
+				},
+				"isActive": {
+					"name": "isActive",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": true,
+					"default": false
+				},
+				"resetPasswordToken": {
+					"name": "resetPasswordToken",
+					"type": "varchar",
+					"primaryKey": false,
+					"notNull": false,
+					"default": "''"
+				},
+				"createdAt": {
+					"name": "createdAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updatedAt": {
+					"name": "updatedAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {
+				"email_idx": {
+					"name": "email_idx",
+					"columns": [
+						{
+							"expression": "email",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": true,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"users_email_unique": {
+					"name": "users_email_unique",
+					"nullsNotDistinct": false,
+					"columns": ["email"]
+				}
+			}
+		},
+		"public.warehouses": {
+			"name": "warehouses",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"name": {
+					"name": "name",
+					"type": "varchar(50)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"location": {
+					"name": "location",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"createdAt": {
+					"name": "createdAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"updatedAt": {
+					"name": "updatedAt",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {}
+		}
+	},
+	"enums": {
+		"public.status": {
+			"name": "status",
+			"schema": "public",
+			"values": ["reserved", "in-stock", "out-of-stock", "returned", "damaged"]
+		},
+		"public.sectionName": {
+			"name": "sectionName",
+			"schema": "public",
+			"values": ["A1", "B2", "C3", "D4", "E5", "F6", "G7", "H8", "I9", "J0"]
+		},
+		"public.role": {
+			"name": "role",
+			"schema": "public",
+			"values": ["admin", "employee"]
+		}
+	},
+	"schemas": {},
+	"sequences": {},
+	"_meta": {
+		"columns": {},
+		"schemas": {},
+		"tables": {}
+	}
+}

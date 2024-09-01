@@ -3,7 +3,7 @@ import { integer, pgTable, serial, timestamp } from "drizzle-orm/pg-core";
 import { orders } from "./order.schema";
 import { products } from "./product.schema";
 
-export const orderItems = pgTable("orderItems", {
+export const orderItems = pgTable("order_items", {
 	id: serial("id").primaryKey(),
 	quantity: integer("quantity").notNull(),
 	// price: integer("price").notNull(),

@@ -4,12 +4,21 @@ import { z } from "zod";
 
 type ValidationErrors = { [key: string]: string[] };
 
+const formatValidationErrors = (errors: ValidationErrors): string => {
+	return Object.entries(errors)
+		.map(([field, messages]) => {
+			const formattedMessages = messages.join(", ");
+			return `${field}: [${formattedMessages}]`;
+		})
+		.join(", ");
+};
+
 const validateRequestBody =
 	(targetSchema: z.Schema): RequestHandler =>
 	({ body }, res, next) => {
 		const validationResult = targetSchema.safeParse(body);
 
-		if (validationResult.success === false) {
+		if (!validationResult.success) {
 			const errorMessage =
 				validationResult.error.errors.reduce<ValidationErrors>(
 					(acc: ValidationErrors, err: z.ZodIssue) => {
@@ -26,7 +35,9 @@ const validateRequestBody =
 					{}
 				);
 
-			throw new createHttpError.BadRequest(JSON.stringify(errorMessage));
+			const formattedMessage = formatValidationErrors(errorMessage);
+
+			throw new createHttpError.BadRequest(formattedMessage);
 		}
 
 		next();

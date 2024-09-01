@@ -45,6 +45,7 @@ export const findProductById = async (id: number) => {
 			sectionName: sections.name,
 			categoryName: categories.name,
 			supplierName: suppliers.name,
+			supplierId: suppliers.id,
 			screenshots: sql`array_agg(${productScreenshots.url})`.as("screenshots"),
 		})
 		.from(products)
@@ -56,7 +57,13 @@ export const findProductById = async (id: number) => {
 			sql`${products.id} = ${productScreenshots.productId}`
 		)
 		.where(sql`${products.id} = ${id}`)
-		.groupBy(products.id, sections.name, categories.name, suppliers.name)
+		.groupBy(
+			products.id,
+			sections.name,
+			categories.name,
+			suppliers.name,
+			suppliers.id
+		)
 		.limit(1);
 
 	return result[0] || null;

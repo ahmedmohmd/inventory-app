@@ -9,7 +9,7 @@ import {
 import { products } from "./product.schema";
 // import { warehouses } from "./warehouse.schema";
 
-export const sectionName = pgEnum("sectionName", [
+export const sectionName = pgEnum("section_name", [
 	"A1",
 	"B2",
 	"C3",
