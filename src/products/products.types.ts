@@ -6,28 +6,11 @@ type CreateProduct = {
 	sku: string;
 	supplierId: number;
 	categoryId: number;
-	sectionId:
-		| "A1"
-		| "B2"
-		| "C3"
-		| "D4"
-		| "E5"
-		| "F6"
-		| "G7"
-		| "H8"
-		| "I9"
-		| "J0";
+	sectionId: number;
 
 	qty: number;
 };
 
 type UpdateProduct = Partial<CreateProduct>;
-
-// type UpdateProductStatus =
-// 	| "reserved"
-// 	| "in-stock"
-// 	| "out-of-stock"
-// 	| "returned"
-// 	| "damaged";
 
 export { CreateProduct, UpdateProduct };

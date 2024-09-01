@@ -10,7 +10,7 @@ import {
 
 const sectionsRouter = express.Router();
 
-sectionsRouter.get("/", sectionsController.findSingleSection);
+sectionsRouter.get("/", sectionsController.findAllSections);
 
 sectionsRouter.get(
 	"/:id",

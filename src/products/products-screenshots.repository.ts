@@ -44,3 +44,10 @@ export const deleteProductScreenshot = async (
 		)
 		.execute();
 };
+
+export const deleteProductScreenshots = async (productId: number) => {
+	return await db
+		.delete(productScreenshots)
+		.where(eq(productScreenshots.productId, productId))
+		.execute();
+};

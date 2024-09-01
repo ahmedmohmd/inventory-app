@@ -1,8 +1,14 @@
 import createHttpError from "http-errors";
 import { findCategoryById } from "../categories/categories.service";
 import { uploadImage } from "../common/utils/cloudinary-service.util";
+import { removeImage } from "../common/utils/image-upload";
+import { findSectionById } from "../sections/sections.service";
 import { findSupplierById } from "../suppliers/suppliers.service";
-import { insertProductScreenshot } from "./products-screenshots.repository";
+import {
+	deleteProductScreenshots,
+	findAllProductScreenshots,
+	insertProductScreenshot,
+} from "./products-screenshots.repository";
 import * as productsRepository from "./products.repository";
 import { CreateProduct, UpdateProduct } from "./products.types";
 
@@ -13,7 +19,13 @@ export const findAllProducts = async () => {
 };
 
 export const findProductById = async (id: number) => {
-	return await productsRepository.findProductById(id);
+	const targetProduct = await productsRepository.findProductById(id);
+
+	if (!targetProduct) {
+		throw new createHttpError.NotFound("Product not found");
+	}
+
+	return targetProduct;
 };
 
 export const insertProduct = async (
@@ -21,22 +33,23 @@ export const insertProduct = async (
 	images: Express.Multer.File[]
 ) => {
 	const targetCategory = await findCategoryById(productData.categoryId);
-
 	if (!targetCategory) {
 		throw new createHttpError.BadRequest("Category not found");
+	}
+
+	const supplier = await findSupplierById(productData.supplierId);
+	if (!supplier) {
+		throw new createHttpError.BadRequest("Supplier not found");
+	}
+
+	const targetSection = await findSectionById(productData.sectionId);
+	if (!targetSection) {
+		throw new createHttpError.BadRequest("Section not found");
 	}
 
 	if (images.length > MAX_IMAGES) {
 		throw new createHttpError.BadRequest("You can only upload up to 4 images");
 	}
-
-	const supplier = await findSupplierById(productData.supplierId);
-
-	if (!supplier) {
-		throw new createHttpError.BadRequest("Supplier not found");
-	}
-
-	// check section
 
 	const createdProduct = await productsRepository.insertProduct(productData);
 
@@ -66,5 +79,21 @@ export const updateProduct = async (id: number, productData: UpdateProduct) => {
 };
 
 export const deleteProduct = async (id: number) => {
+	const targetProduct = await productsRepository.findProductById(id);
+
+	if (!targetProduct) {
+		throw new createHttpError.BadRequest("Product not found");
+	}
+
+	const productScreenshots = await findAllProductScreenshots(targetProduct.id);
+
+	if (productScreenshots.length > 0) {
+		for (const screenshot of productScreenshots) {
+			await removeImage(screenshot.publicId); //eslint-disable-line
+		}
+	}
+
+	await deleteProductScreenshots(targetProduct.id);
+
 	return await productsRepository.deleteProduct(id);
 };
