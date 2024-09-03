@@ -6,7 +6,7 @@ import productsRouter from "../products";
 import sectionsRouter from "../sections";
 import suppliersRouter from "../suppliers";
 import usersRouter from "../users";
-import ordersRouter from "../orders";
+import orders from "../orders";
 
 const handleRoutes = (app: Application) => {
 	app.use("/api/v1/auth", authRouter);
@@ -15,7 +15,7 @@ const handleRoutes = (app: Application) => {
 	app.use("/api/v1/suppliers", suppliersRouter);
 	app.use("/api/v1/sections", sectionsRouter);
 	app.use("/api/v1/products", productsRouter);
-	app.use("/api/v1/orders", ordersRouter);
+	app.use("/api/v1/orders", orders.router);
 	app.use(globalErrorHandler);
 };
 

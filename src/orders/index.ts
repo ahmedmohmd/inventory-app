@@ -1,3 +1,5 @@
-import { ordersRouter } from "./orders.router";
+import ordersRouter from "./orders.router";
 
-export default ordersRouter;
+export default {
+	router: ordersRouter,
+};

@@ -3,25 +3,25 @@ import { z } from "zod";
 const createProductSchema = z.object({
 	name: z.string(),
 	description: z.string().optional(),
-	price: z.string().regex(/^\d+$/),
+	price: z.number(),
 	status: z.string(),
 	sku: z.string(),
-	supplierId: z.string().regex(/^\d+$/),
-	categoryId: z.string().regex(/^\d+$/),
-	sectionId: z.string().regex(/^\d+$/),
-	qty: z.string().regex(/^\d+$/),
+	supplierId: z.number(),
+	categoryId: z.number(),
+	sectionId: z.number(),
+	qty: z.number(),
 });
 
 const updateProductSchema = z.object({
 	name: z.string().optional(),
 	description: z.string().optional(),
-	price: z.string().regex(/^\d+$/).optional(),
+	price: z.number().optional(),
 	status: z.string().optional(),
 	sku: z.string().optional(),
-	supplierId: z.string().regex(/^\d+$/).optional(),
-	categoryId: z.string().regex(/^\d+$/).optional(),
-	sectionId: z.string().regex(/^\d+$/).optional(),
-	qty: z.string().regex(/^\d+$/).optional(),
+	supplierId: z.number().optional(),
+	categoryId: z.number().optional(),
+	sectionId: z.number().optional(),
+	qty: z.number().optional(),
 });
 
 const productIdSchema = z.object({

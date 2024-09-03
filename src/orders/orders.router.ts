@@ -2,46 +2,41 @@ import express from "express";
 
 import * as ordersController from "./orders.controller";
 import { validateRequestBody } from "../common/middleware/validate-request-body.middleware";
-import {
-	changeOrderStateSchema,
-	createOrderSchema,
-	findAllOrdersQuerySchema,
-	orderIdSchema,
-} from "./orders-validation-schema";
 import { validateRequestParams } from "../common/middleware/validate-request-params.middleware";
 import { validateRequestQuery } from "../common/middleware/validate-request-query.middleware";
+import ordersValidationSchema from "./orders-validation-schema";
 
 const ordersRouter = express.Router();
 
 ordersRouter.get(
 	"/",
-	validateRequestQuery(findAllOrdersQuerySchema),
+	validateRequestQuery(ordersValidationSchema.findAllOrdersQuerySchema),
 	ordersController.getAllOrders
 );
 
 ordersRouter.get(
 	"/:id",
-	validateRequestParams(orderIdSchema),
+	validateRequestParams(ordersValidationSchema.orderIdSchema),
 	ordersController.getSingleOrder
 );
 
 ordersRouter.post(
 	"/",
-	validateRequestBody(createOrderSchema),
+	validateRequestBody(ordersValidationSchema.createOrderSchema),
 	ordersController.createOrder
 );
 
 ordersRouter.patch(
 	"/:id",
-	validateRequestParams(orderIdSchema),
-	validateRequestBody(changeOrderStateSchema),
+	validateRequestParams(ordersValidationSchema.orderIdSchema),
+	validateRequestBody(ordersValidationSchema.changeOrderStateSchema),
 	ordersController.updateOrderStatus
 );
 
 ordersRouter.delete(
 	"/:id",
-	validateRequestParams(orderIdSchema),
+	validateRequestParams(ordersValidationSchema.orderIdSchema),
 	ordersController.deleteOrder
 );
 
-export { ordersRouter };
+export default ordersRouter;

@@ -1,9 +1,14 @@
 export enum OrderStatus {
 	PENDING = "pending",
-	PROCESSING = "completed",
+	COMPLETED = "completed",
 }
 
-export enum OrdersQuerySortBy {
+export enum OrdersSortKey {
 	CREATED_AT = "createdAt",
 	TOTAL = "total",
 }
+
+export default {
+	OrderStatus,
+	OrdersSortKey,
+};

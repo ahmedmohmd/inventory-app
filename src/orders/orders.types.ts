@@ -1,8 +1,4 @@
-export type CreateOrderItem = {
-	productId: number;
-	quantity: number;
-	orderId: number;
-};
+import { OrderStatus } from "./orders.enum";
 
 export type OrderItem = {
 	productId: number;
@@ -16,7 +12,7 @@ export type CreateOrder = {
 
 export type IOrder = {
 	total: number;
-	status?: "pending" | "completed";
+	status?: OrderStatus;
 	supplierId: number;
 };
 
@@ -26,6 +22,11 @@ export type FindAllOrdersQuery = {
 	supplierId?: number;
 	sortBy?: "createdAt" | "total";
 	order?: "asc" | "desc";
+	status?: "pending" | "completed";
 };
 
 export type UpdateOrder = Partial<CreateOrder>;
+
+export type UpdateOrderStatus = {
+	status: OrderStatus;
+};

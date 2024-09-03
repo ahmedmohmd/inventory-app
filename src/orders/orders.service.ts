@@ -1,114 +1,182 @@
 import createHttpError from "http-errors";
 import { findProductById } from "../products/products.service";
-import { insertOrderItem } from "./order-items.repository";
-import * as ordersRepository from "./orders.repository";
+import ordersRepository from "./orders.repository";
 import { CreateOrder, FindAllOrdersQuery } from "./orders.types";
 import { OrderStatus } from "./orders.enum";
-import * as orderItemsRepository from "./order-items.repository";
 import { config } from "../../config/config";
+import * as productService from "../products/products.service";
+import orderItems from "../order-items";
 
-export const findAllOrders = async (query: FindAllOrdersQuery) => {
-	const page = Number(query.page) || config.pagination.page;
-	const limit = Number(query.limit) || config.pagination.limit;
+/**
+ * Retrieves a list of orders based on the provided query parameters.
+ *
+ * @param {FindAllOrdersQuery} query - The query parameters to filter orders by.
+ * @return {object} An object containing pagination metadata and an array of orders.
+ */
+const findAllOrders = async (query: FindAllOrdersQuery) => {
+	const orders = await ordersRepository.findAllOrders(query);
 
-	const allOrders = await ordersRepository.findAllOrders(query);
-	const [totalCount] = await ordersRepository.countAllOrders();
-	const totalPages = Math.ceil(totalCount.count / limit);
-	const currentPage = page;
+	const currentPage = Number(query.page) || config.pagination.page;
+	const pageSize = Number(query.limit) || config.pagination.limit;
+	const totalCount = await ordersRepository.countAllOrders(query);
+	const totalPages = Math.ceil(totalCount / pageSize);
 	const nextPage = currentPage < totalPages ? currentPage + 1 : null;
 	const prevPage = currentPage > 1 ? currentPage - 1 : null;
 
 	return {
 		pagination: {
-			page_size: limit,
-			total_count: totalCount.count,
+			page_size: pageSize,
+			total_count: totalCount,
 			total_pages: totalPages,
 			current_page: currentPage,
 			next_page: nextPage,
 			prev_page: prevPage,
 		},
 
-		data: allOrders,
+		data: orders,
 	};
 };
 
-export const findOrderById = async (id: number) => {
-	const targetOrder = await ordersRepository.findOrderById(id);
+/**
+ * Finds an order by its ID.
+ *
+ * @param {number} id - The ID of the order to find.
+ * @return {Promise<Order>} A promise that resolves to the found order, or throws a NotFound error if the order is not found.
+ */
+const findOrderById = async (id: number) => {
+	const order = await ordersRepository.findOrderById(id);
 
-	if (!targetOrder) {
+	if (!order) {
 		throw new createHttpError.NotFound(`Order with ID: ${id} not found.`);
 	}
 
-	return targetOrder;
+	return order;
 };
 
-export const insertOrder = async (data: CreateOrder) => {
-	let total = 0;
-	const allProducts: any[] = []; // eslint-disable-line
+/**
+ * Inserts a new order into the database.
+ *
+ * @param {CreateOrder} data - The order data to be inserted.
+ * @return {Promise<Order[]>} A promise that resolves to the created order.
+ * @throws {createHttpError.BadRequest} If a product is not found or if products are not from the same supplier.
+ */
+const insertOrder = async (data: CreateOrder) => {
+	const productPromises = data.items.map((item) =>
+		findProductById(item.productId)
+	);
+	const products = await Promise.all(productPromises);
+
+	let totalMoney = 0;
 
 	for (const item of data.items) {
-		const targetProduct = await findProductById(item.productId); // eslint-disable-line
+		const targetProduct = products.find(
+			(product) => product.id === item.productId
+		);
 
 		if (!targetProduct) {
-			throw new createHttpError.BadRequest("Product not found");
+			throw new createHttpError.BadRequest(
+				`Product with ID: ${item.productId} not found.`
+			);
 		}
 
-		allProducts.push(targetProduct);
-
-		total += targetProduct.price * item.quantity;
+		totalMoney += targetProduct.price * item.quantity;
 	}
 
-	const isTheSameSupplier = allProducts.every((product) => {
+	const isFromSameSupplier = products.every((product) => {
 		return product.supplierId === data.supplierId;
 	});
 
-	if (!isTheSameSupplier) {
+	if (!isFromSameSupplier) {
 		throw new createHttpError.BadRequest(
-			"Products must be from the same supplier"
+			"Products must be from the same supplier."
 		);
 	}
 
 	const createdOrder = await ordersRepository.insertOrder({
-		status: "pending",
-		total: total,
+		status: OrderStatus.PENDING,
+		total: totalMoney,
 		supplierId: data.supplierId,
 	});
 
-	if (createdOrder.length > 0) {
-		for (const item of data.items) {
-			//eslint-disable-next-line
-			const order = await insertOrderItem({
-				orderId: createdOrder[0].id,
-				productId: item.productId,
-				quantity: item.quantity,
-			});
-		}
-	}
+	const orderItemsPromises = data.items.map((item) =>
+		orderItems.service.insertOrderItem({
+			orderId: createdOrder[0].id,
+			productId: item.productId,
+			quantity: item.quantity,
+		})
+	);
+	await Promise.all(orderItemsPromises);
 
 	return createdOrder;
 };
 
-export const changeOrderState = async (
-	orderId: number,
-	status: OrderStatus
-) => {
-	const targetOrder = await ordersRepository.findOrderById(orderId);
-
-	if (!targetOrder) {
+/**
+ * Changes the state of an order.
+ *
+ * @param {number} orderId - The ID of the order to be updated.
+ * @param {OrderStatus} status - The new status of the order.
+ * @return {Promise} A promise that resolves to the updated order.
+ */
+const changeOrderState = async (orderId: number, status: OrderStatus) => {
+	const order = await ordersRepository.findOrderById(orderId);
+	if (!order) {
 		throw new createHttpError.NotFound(`Order with ID: ${orderId} not found.`);
 	}
 
-	return await ordersRepository.changeOrderState(orderId, status);
+	if (order.status === OrderStatus.COMPLETED) {
+		throw new createHttpError.BadRequest(
+			"You can't change the status of a completed order."
+		);
+	}
+
+	const updateResult = await ordersRepository.changeOrderState(orderId, status);
+
+	const productsPromises = order.orderItems.map((item) =>
+		findProductById(item.productId)
+	);
+	const products = await Promise.all(productsPromises);
+
+	const updateProductsQuantity = order.orderItems.map((item) => {
+		const product = products.find((product) => product.id === item.productId);
+
+		if (!product) {
+			throw new createHttpError.BadRequest("Product not found");
+		}
+
+		return productService.updateProduct(item.productId, {
+			qty: product.quantity + item.quantity,
+		});
+	});
+
+	if (status === OrderStatus.COMPLETED) {
+		await Promise.all(updateProductsQuantity);
+	}
+
+	return updateResult;
 };
 
-export const deleteOrder = async (id: number) => {
-	const targetOrder = await ordersRepository.findOrderById(id);
+/**
+ * Deletes an order by its ID.
+ *
+ * @param {number} id - The ID of the order to be deleted.
+ * @return {Promise} A promise that resolves with the result of the deletion operation.
+ */
+const deleteOrder = async (id: number) => {
+	const order = await ordersRepository.findOrderById(id);
 
-	if (!targetOrder) {
+	if (!order) {
 		throw new createHttpError.NotFound(`Order with ID: ${id} not found.`);
 	}
 
-	await orderItemsRepository.deleteOrderItem(targetOrder.id);
+	await orderItems.service.deleteOrderItem(order.id);
 
 	return await ordersRepository.deleteOrder(id);
+};
+
+export default {
+	findAllOrders,
+	findOrderById,
+	insertOrder,
+	changeOrderState,
+	deleteOrder,
 };

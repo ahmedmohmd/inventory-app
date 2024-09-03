@@ -1,5 +1,5 @@
 import { QueryOrder } from "../common/enums/order.enum";
-import { OrdersQuerySortBy } from "./orders.enum";
+import { OrdersSortKey } from "./orders.enum";
 import { z } from "zod";
 
 const OrderStatus = z.enum(["pending", "completed"]);
@@ -22,9 +22,10 @@ const changeOrderStateSchema = z.object({
 });
 
 const OrdersQuerySortBySchema = z.enum([
-	OrdersQuerySortBy.TOTAL,
-	OrdersQuerySortBy.CREATED_AT,
+	OrdersSortKey.TOTAL,
+	OrdersSortKey.CREATED_AT,
 ]);
+const OrderQueryStatus = z.enum(["pending", "completed"]);
 const OrdersQueryOrder = z.enum([QueryOrder.ASC, QueryOrder.DESC]);
 const findAllOrdersQuerySchema = z.object({
 	limit: z.string().regex(/^\d+$/).optional(),
@@ -32,9 +33,10 @@ const findAllOrdersQuerySchema = z.object({
 	supplierId: z.string().regex(/^\d+$/).optional(),
 	sortBy: OrdersQuerySortBySchema.optional(),
 	order: OrdersQueryOrder.optional(),
+	status: OrderQueryStatus.optional(),
 });
 
-export {
+export default {
 	createOrderSchema,
 	orderIdSchema,
 	changeOrderStateSchema,
