@@ -1,6 +1,8 @@
+import { CategoryName } from "./categories.enum";
+
 export type CreateCategory = {
-	name: string;
+	name: CategoryName;
 	description?: string;
 };
 
-export type UpdateCategory = Partial<CreateCategory>;
+export type UpdateCategory = Partial<Pick<CreateCategory, "description">>;

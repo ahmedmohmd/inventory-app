@@ -148,6 +148,13 @@
 			"when": 1725212120042,
 			"tag": "0020_white_ultimo",
 			"breakpoints": true
+		},
+		{
+			"idx": 21,
+			"version": "7",
+			"when": 1725380239849,
+			"tag": "0021_abnormal_living_mummy",
+			"breakpoints": true
 		}
 	]
 }

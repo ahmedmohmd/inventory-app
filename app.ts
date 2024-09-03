@@ -15,6 +15,7 @@ bootstrap.handleCompression(app);
 bootstrap.handleCors(app);
 bootstrap.handleSecurity(app);
 bootstrap.handleRateLimiting(app);
+bootstrap.handleSwaggerDocs(app);
 
 // All App Routes
 bootstrap.handleRoutes(app);

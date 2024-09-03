@@ -1,21 +1,8 @@
 import express from "express";
-// import { Role } from "../common/enums/user-role.enum";
-// import { authUserRoles } from "../common/middleware/auth-user-roles.middleware";
-// import { authenticate } from "../common/middleware/authenticate.middleware";
 import { validateRequestBody } from "../common/middleware/validate-request-body.middleware";
 import { validateRequestParams } from "../common/middleware/validate-request-params.middleware";
-import {
-	createCategory,
-	deleteCategory,
-	getAllCategories,
-	getSingleCategory,
-	updateCategory,
-} from "./categories.controller";
-import {
-	categoryIdSchema,
-	createCategorySchema,
-	updateCategorySchema,
-} from "./categories.validation-schema";
+import categoriesController from "./categories.controller";
+import categoriesValidationSchema from "./categories.validation-schema";
 
 const router = express.Router();
 
@@ -24,40 +11,40 @@ router.get(
 	// authenticate,
 	// authUserRoles(Role.ADMIN)
 
-	getAllCategories
+	categoriesController.getAllCategories
 );
 
 router.get(
 	"/:id",
 	// authenticate,
 	// authUserRoles(Role.ADMIN, Role.EMPLOYEE),
-	validateRequestParams(categoryIdSchema),
-	getSingleCategory
+	validateRequestParams(categoriesValidationSchema.categoryIdSchema),
+	categoriesController.getSingleCategory
 );
 
 router.post(
 	"/",
 	// authenticate,
 	// authUserRoles(Role.ADMIN, Role.EMPLOYEE),
-	validateRequestBody(createCategorySchema),
-	createCategory
+	validateRequestBody(categoriesValidationSchema.createCategorySchema),
+	categoriesController.createCategory
 );
 
 router.patch(
 	"/:id",
 	// authenticate,
-	validateRequestParams(categoryIdSchema),
+	validateRequestParams(categoriesValidationSchema.categoryIdSchema),
 	// authUserRoles(Role.ADMIN, Role.EMPLOYEE),
-	validateRequestBody(updateCategorySchema),
-	updateCategory
+	validateRequestBody(categoriesValidationSchema.updateCategorySchema),
+	categoriesController.updateCategory
 );
 
 router.delete(
 	"/:id",
 	// authenticate,
 	// authUserRoles(Role.ADMIN, Role.EMPLOYEE),
-	validateRequestParams(categoryIdSchema),
-	deleteCategory
+	validateRequestParams(categoriesValidationSchema.categoryIdSchema),
+	categoriesController.deleteCategory
 );
 
 export default router;

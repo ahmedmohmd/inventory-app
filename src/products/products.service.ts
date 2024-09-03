@@ -1,5 +1,6 @@
 import createHttpError from "http-errors";
-import { findCategoryById } from "../categories/categories.service";
+// import { findCategoryById } from "../categories/categories.service";
+import categories from "../categories";
 import { uploadImage } from "../common/utils/cloudinary-service.util";
 import { removeImage } from "../common/utils/image-upload";
 import { findSectionById } from "../sections/sections.service";
@@ -32,7 +33,9 @@ export const insertProduct = async (
 	productData: CreateProduct,
 	images: Express.Multer.File[]
 ) => {
-	const targetCategory = await findCategoryById(productData.categoryId);
+	const targetCategory = await categories.service.findCategoryById(
+		productData.categoryId
+	);
 	if (!targetCategory) {
 		throw new createHttpError.BadRequest("Category not found");
 	}

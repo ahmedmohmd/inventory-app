@@ -1,5 +1,6 @@
 import { InferInsertModel, relations } from "drizzle-orm";
 import {
+	pgEnum,
 	pgTable,
 	serial,
 	timestamp,
@@ -8,20 +9,24 @@ import {
 } from "drizzle-orm/pg-core";
 import { products } from "./product.schema";
 
-// export const categoryName = pgEnum("category_name", [
-// 	"pc",
-// 	"storage",
-// 	"accessories",
-// ]);
+export const CategoryName = pgEnum("category_name", [
+	"accessories",
+	"games",
+	"networks",
+	"offices",
+	"pc",
+	"peripherals",
+	"smart_home",
+	"software",
+	"storage",
+	"pc_components",
+]);
 
 export const categories = pgTable(
 	"categories",
 	{
 		id: serial("id").primaryKey(),
-		name: varchar("name", {
-			length: 25,
-		}).notNull(),
-
+		name: CategoryName("category_name").notNull(),
 		description: varchar("description", {
 			length: 255,
 		}),

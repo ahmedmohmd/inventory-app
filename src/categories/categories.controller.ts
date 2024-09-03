@@ -1,40 +1,73 @@
 import { RequestHandler } from "express";
 import { HttpStatusCode } from "../common/enums/http-status-code.enum";
-import * as categoryService from "./categories.service";
+import categoryService from "./categories.service";
 
+/**
+ * Retrieves a single category by its ID.
+ *
+ * @param {object} params - The request parameters containing the category ID.
+ * @return {object} An object containing the retrieved category.
+ */
 const getSingleCategory: RequestHandler = async ({ params }, res) => {
 	res
 		.status(HttpStatusCode.OK)
 		.json(await categoryService.findCategoryById(Number(params.id)));
 };
 
-const getAllCategories: RequestHandler = async (req, res) => {
-	res.status(HttpStatusCode.OK).json(await categoryService.findAllCategories());
+/**
+ * Retrieves all categories from the database.
+ *
+ * @return {object[]} An array of category objects.
+ */
+const getAllCategories: RequestHandler = async (__, res) => {
+	const categories = await categoryService.findAllCategories();
+
+	res.status(HttpStatusCode.OK).json(categories);
 };
 
+/**
+ * Updates a category in the database.
+ *
+ * @param {object} body - The updated category data.
+ * @param {object} params - The request parameters containing the category ID.
+ * @return {void} A Promise that resolves when the category is updated.
+ */
 const updateCategory: RequestHandler = async ({ body, params }, res) => {
-	await categoryService.updateCategory(Number(params.id), body);
+	const categoryId = Number(params.id);
 
-	res.status(HttpStatusCode.CREATED).json({
-		message: "Category updated successfully.",
-	});
+	await categoryService.updateCategory(categoryId, body);
+
+	res.status(HttpStatusCode.CREATED).send();
 };
 
+/**
+ * Creates a new category by inserting it into the database.
+ *
+ * @param {object} body - The request body containing the new category data.
+ * @return {object} The newly created category object.
+ */
 const createCategory: RequestHandler = async ({ body }, res) => {
 	const createdCategory = await categoryService.insertCategory(body);
 
 	res.status(HttpStatusCode.CREATED).json(createdCategory);
 };
 
+/**
+ * Deletes a category from the database.
+ *
+ * @param {object} req - The request object.
+ * @param {object} res - The response object.
+ * @return {Promise<void>} A Promise that resolves when the category is deleted.
+ */
 const deleteCategory: RequestHandler = async ({ params }, res) => {
-	await categoryService.deleteCategory(Number(params.id));
+	const categoryId = Number(params.id);
 
-	res.status(HttpStatusCode.NO_CONTENT).json({
-		message: "Category deleted successfully.",
-	});
+	await categoryService.deleteCategory(categoryId);
+
+	res.status(HttpStatusCode.NO_CONTENT).send();
 };
 
-export {
+export default {
 	createCategory,
 	deleteCategory,
 	getAllCategories,

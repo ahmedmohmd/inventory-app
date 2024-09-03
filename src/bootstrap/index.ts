@@ -3,6 +3,7 @@ import handleCors from "./cors";
 import handleRateLimiting from "./rate-limiting";
 import { handleRoutes } from "./routes";
 import handleSecurity from "./security";
+import { handleSwaggerDocs } from "./swagger";
 
 export default {
 	handleRoutes,
@@ -10,4 +11,5 @@ export default {
 	handleCors,
 	handleRateLimiting,
 	handleSecurity,
+	handleSwaggerDocs,
 };

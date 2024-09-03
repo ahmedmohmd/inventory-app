@@ -1,6 +1,6 @@
 import { Application } from "express";
 import authRouter from "../auth";
-import categoriesRouter from "../categories";
+import categories from "../categories";
 import globalErrorHandler from "../global-errors/global-error.handler";
 import productsRouter from "../products";
 import sectionsRouter from "../sections";
@@ -11,7 +11,7 @@ import orders from "../orders";
 const handleRoutes = (app: Application) => {
 	app.use("/api/v1/auth", authRouter);
 	app.use("/api/v1/users", usersRouter);
-	app.use("/api/v1/categories", categoriesRouter);
+	app.use("/api/v1/categories", categories.router);
 	app.use("/api/v1/suppliers", suppliersRouter);
 	app.use("/api/v1/sections", sectionsRouter);
 	app.use("/api/v1/products", productsRouter);

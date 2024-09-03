@@ -1,0 +1,181 @@
+{
+	"swagger": "2.0",
+	"info": {
+		"title": "Inventory API",
+		"description": "API for managing inventory",
+		"version": "1.0.0"
+	},
+	"host": "localhost:3000",
+	"basePath": "/api/v1",
+	"schemes": ["http"],
+	"consumes": ["application/json"],
+	"produces": ["application/json"],
+	"tags": [
+		{
+			"name": "Categories",
+			"description": "Category management"
+		}
+	],
+	"paths": {
+		"/categories": {
+			"get": {
+				"summary": "Retrieve a list of categories",
+				"description": "Returns a list of all categories in the system",
+				"tags": ["Categories"],
+				"responses": {
+					"200": {
+						"description": "A list of categories",
+						"schema": {
+							"type": "array",
+							"items": {
+								"$ref": "#/definitions/Category"
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"summary": "Create a new category",
+				"description": "Creates a new category in the system",
+				"tags": ["Categories"],
+				"parameters": [
+					{
+						"in": "body",
+						"name": "category",
+						"description": "The category to create",
+						"schema": {
+							"$ref": "#/definitions/CreateCategory"
+						}
+					}
+				],
+				"responses": {
+					"201": {
+						"description": "The created category",
+						"schema": {
+							"$ref": "#/definitions/Category"
+						}
+					}
+				}
+			}
+		},
+		"/categories/{id}": {
+			"get": {
+				"summary": "Retrieve a category by ID",
+				"description": "Returns a category by its ID",
+				"tags": ["Categories"],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"description": "The ID of the category",
+						"required": true,
+						"type": "integer"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The category",
+						"schema": {
+							"$ref": "#/definitions/Category"
+						}
+					}
+				}
+			},
+
+			"patch": {
+				"summary": "Update a category",
+				"description": "Updates a category in the system",
+				"tags": ["Categories"],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"description": "The ID of the category",
+						"required": true,
+						"type": "integer"
+					},
+					{
+						"in": "body",
+						"name": "category",
+						"description": "The updated category",
+						"schema": {
+							"$ref": "#/definitions/UpdateCategory"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "The category was updated successfully"
+					}
+				}
+			},
+
+			"delete": {
+				"summary": "Delete a category",
+				"description": "Deletes a category by its ID",
+				"tags": ["Categories"],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"description": "The ID of the category",
+						"required": true,
+						"type": "integer"
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "The category was deleted successfully"
+					}
+				}
+			}
+		}
+	},
+	"definitions": {
+		"Category": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"createdAt": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string"
+				}
+			}
+		},
+
+		"CreateCategory": {
+			"type": "object",
+			"properties": {
+				"name": {
+					"type": "string",
+					"example": "electronics"
+				},
+				"description": {
+					"type": "string",
+					"example": "Electronics category."
+				}
+			}
+		},
+
+		"UpdateCategory": {
+			"type": "object",
+			"properties": {
+				"description": {
+					"type": "string",
+					"example": "Electronics category.",
+					"nullable": true
+				}
+			}
+		}
+	}
+}
