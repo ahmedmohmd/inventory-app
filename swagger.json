@@ -129,6 +129,119 @@
 					}
 				}
 			}
+		},
+
+		"/sections": {
+			"get": {
+				"summary": "Retrieve a list of sections",
+				"description": "Returns a list of all sections in the system",
+				"tags": ["Sections"],
+				"responses": {
+					"200": {
+						"description": "A list of sections",
+						"schema": {
+							"type": "array",
+							"items": {
+								"$ref": "#/definitions/Section"
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"summary": "Create a new section",
+				"description": "Creates a new section in the system",
+				"tags": ["Sections"],
+				"parameters": [
+					{
+						"in": "body",
+						"name": "section",
+						"description": "The section to create",
+						"schema": {
+							"$ref": "#/definitions/CreateSection"
+						}
+					}
+				],
+				"responses": {
+					"201": {
+						"description": "The created section",
+						"schema": {
+							"$ref": "#/definitions/Section"
+						}
+					}
+				}
+			}
+		},
+
+		"/sections/{id}": {
+			"get": {
+				"summary": "Retrieve a section by ID",
+				"description": "Returns a section by its ID",
+				"tags": ["Sections"],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"description": "The ID of the section",
+						"required": true,
+						"type": "integer"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The section",
+						"schema": {
+							"$ref": "#/definitions/Section"
+						}
+					}
+				}
+			},
+			"patch": {
+				"summary": "Update a section",
+				"description": "Updates a section in the system",
+				"tags": ["Sections"],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"description": "The ID of the section",
+						"required": true,
+						"type": "integer"
+					},
+					{
+						"in": "body",
+						"name": "section",
+						"description": "The updated section",
+						"schema": {
+							"$ref": "#/definitions/UpdateSection"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "The section was updated successfully"
+					}
+				}
+			},
+			"delete": {
+				"summary": "Delete a section",
+				"description": "Deletes a section by its ID",
+				"tags": ["Sections"],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"description": "The ID of the section",
+						"required": true,
+						"type": "integer"
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "The section was deleted successfully"
+					}
+				}
+			}
 		}
 	},
 	"definitions": {
@@ -173,6 +286,52 @@
 				"description": {
 					"type": "string",
 					"example": "Electronics category.",
+					"nullable": true
+				}
+			}
+		},
+
+		"Section": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"createdAt": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string"
+				}
+			}
+		},
+
+		"CreateSection": {
+			"type": "object",
+			"properties": {
+				"name": {
+					"type": "string",
+					"example": "example section"
+				},
+				"description": {
+					"type": "string",
+					"example": "Example section description."
+				}
+			}
+		},
+
+		"UpdateSection": {
+			"type": "object",
+			"properties": {
+				"description": {
+					"type": "string",
+					"example": "Updated section description.",
 					"nullable": true
 				}
 			}

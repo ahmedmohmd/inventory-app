@@ -1,16 +1,17 @@
 import { z } from "zod";
+import { SectionName } from "./sections.enum";
 
 const SectionNameSchema = z.enum([
-	"A1",
-	"B2",
-	"C3",
-	"D4",
-	"E5",
-	"F6",
-	"G7",
-	"H8",
-	"I9",
-	"J0",
+	SectionName.ACCESSORIES,
+	SectionName.GAMES,
+	SectionName.NETWORKS,
+	SectionName.OFFICES,
+	SectionName.PC,
+	SectionName.PC_COMPONENTS,
+	SectionName.PERIPHERALS,
+	SectionName.SMART_HOME,
+	SectionName.SOFTWARE,
+	SectionName.STORAGE,
 ]);
 
 const createSectionSchema = z.object({
@@ -19,7 +20,6 @@ const createSectionSchema = z.object({
 });
 
 const updateSectionSchema = z.object({
-	name: SectionNameSchema.optional(),
 	description: z.string().optional(),
 });
 
@@ -27,4 +27,4 @@ const sectionIdSchema = z.object({
 	id: z.string().regex(/^\d+$/),
 });
 
-export { createSectionSchema, sectionIdSchema, updateSectionSchema };
+export default { sectionIdSchema, createSectionSchema, updateSectionSchema };

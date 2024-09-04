@@ -2,11 +2,7 @@ import express from "express";
 import { validateRequestBody } from "../common/middleware/validate-request-body.middleware";
 import { validateRequestParams } from "../common/middleware/validate-request-params.middleware";
 import * as sectionsController from "./sections.controller";
-import {
-	createSectionSchema,
-	sectionIdSchema,
-	updateSectionSchema,
-} from "./sections.validation-schema";
+import sectionsValidationSchema from "./sections.validation-schema";
 
 const sectionsRouter = express.Router();
 
@@ -14,26 +10,26 @@ sectionsRouter.get("/", sectionsController.findAllSections);
 
 sectionsRouter.get(
 	"/:id",
-	validateRequestParams(sectionIdSchema),
+	validateRequestParams(sectionsValidationSchema.sectionIdSchema),
 	sectionsController.findSingleSection
 );
 
 sectionsRouter.post(
 	"/",
-	validateRequestBody(createSectionSchema),
+	validateRequestBody(sectionsValidationSchema.createSectionSchema),
 	sectionsController.createSection
 );
 
 sectionsRouter.patch(
 	"/:id",
-	validateRequestParams(sectionIdSchema),
-	validateRequestBody(updateSectionSchema),
+	validateRequestParams(sectionsValidationSchema.sectionIdSchema),
+	validateRequestBody(sectionsValidationSchema.updateSectionSchema),
 	sectionsController.updateSection
 );
 
 sectionsRouter.delete(
 	"/:id",
-	validateRequestParams(sectionIdSchema),
+	validateRequestParams(sectionsValidationSchema.sectionIdSchema),
 	sectionsController.deleteSection
 );
 

@@ -1,9 +1,8 @@
 import createHttpError from "http-errors";
-// import { findCategoryById } from "../categories/categories.service";
 import categories from "../categories";
 import { uploadImage } from "../common/utils/cloudinary-service.util";
 import { removeImage } from "../common/utils/image-upload";
-import { findSectionById } from "../sections/sections.service";
+import sections from "../sections";
 import { findSupplierById } from "../suppliers/suppliers.service";
 import {
 	deleteProductScreenshots,
@@ -45,7 +44,9 @@ export const insertProduct = async (
 		throw new createHttpError.BadRequest("Supplier not found");
 	}
 
-	const targetSection = await findSectionById(productData.sectionId);
+	const targetSection = await sections.service.findSectionById(
+		productData.sectionId
+	);
 	if (!targetSection) {
 		throw new createHttpError.BadRequest("Section not found");
 	}
