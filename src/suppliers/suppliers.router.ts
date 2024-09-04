@@ -1,12 +1,8 @@
 import express from "express";
 import { validateRequestBody } from "../common/middleware/validate-request-body.middleware";
 import { validateRequestParams } from "../common/middleware/validate-request-params.middleware";
-import * as suppliersController from "./suppliers.controller";
-import {
-	createSupplierSchema,
-	supplierIdSchema,
-	updateSupplierSchema,
-} from "./suppliers.validation-schema";
+import suppliersController from "./suppliers.controller";
+import suppliersValidationSchema from "./suppliers.validation-schema";
 
 const suppliersRouter = express.Router();
 
@@ -14,26 +10,26 @@ suppliersRouter.get("/", suppliersController.findAllSuppliers);
 
 suppliersRouter.get(
 	"/:id",
-	validateRequestParams(supplierIdSchema),
+	validateRequestParams(suppliersValidationSchema.supplierIdSchema),
 	suppliersController.findSingleSupplier
 );
 
 suppliersRouter.post(
 	"/",
-	validateRequestBody(createSupplierSchema),
+	validateRequestBody(suppliersValidationSchema.createSupplierSchema),
 	suppliersController.createSupplier
 );
 
 suppliersRouter.patch(
 	"/:id",
-	validateRequestParams(supplierIdSchema),
-	validateRequestBody(updateSupplierSchema),
+	validateRequestParams(suppliersValidationSchema.supplierIdSchema),
+	validateRequestBody(suppliersValidationSchema.updateSupplierSchema),
 	suppliersController.updateSupplier
 );
 
 suppliersRouter.delete(
 	"/:id",
-	validateRequestParams(supplierIdSchema),
+	validateRequestParams(suppliersValidationSchema.supplierIdSchema),
 	suppliersController.deleteSupplier
 );
 

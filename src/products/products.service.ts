@@ -3,7 +3,6 @@ import categories from "../categories";
 import { uploadImage } from "../common/utils/cloudinary-service.util";
 import { removeImage } from "../common/utils/image-upload";
 import sections from "../sections";
-import { findSupplierById } from "../suppliers/suppliers.service";
 import {
 	deleteProductScreenshots,
 	findAllProductScreenshots,
@@ -11,6 +10,7 @@ import {
 } from "./products-screenshots.repository";
 import * as productsRepository from "./products.repository";
 import { CreateProduct, UpdateProduct } from "./products.types";
+import suppliers from "../suppliers";
 
 const MAX_IMAGES = 4;
 
@@ -39,7 +39,9 @@ export const insertProduct = async (
 		throw new createHttpError.BadRequest("Category not found");
 	}
 
-	const supplier = await findSupplierById(productData.supplierId);
+	const supplier = await suppliers.service.findSupplierById(
+		productData.supplierId
+	);
 	if (!supplier) {
 		throw new createHttpError.BadRequest("Supplier not found");
 	}

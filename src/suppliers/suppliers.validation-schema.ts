@@ -18,4 +18,4 @@ const supplierIdSchema = z.object({
 	id: z.string().regex(/^\d+$/),
 });
 
-export { createSupplierSchema, supplierIdSchema, updateSupplierSchema };
+export default { createSupplierSchema, supplierIdSchema, updateSupplierSchema };
