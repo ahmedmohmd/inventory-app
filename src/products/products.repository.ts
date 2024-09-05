@@ -1,91 +1,173 @@
-import { eq, sql } from "drizzle-orm";
+import { and, asc, DBQueryConfig, desc, eq, SQL } from "drizzle-orm";
 import { db } from "../db";
-import { categories } from "../db/schema/category.schema";
-import { productScreenshots } from "../db/schema/product-screenshot.schema";
 import { products } from "../db/schema/product.schema";
-import { sections } from "../db/schema/section.schema";
-import { suppliers } from "../db/schema/supplier.schema";
-import { CreateProduct, UpdateProduct } from "./products.types";
+import {
+	CreateProduct,
+	FindAllProductsQuery,
+	UpdateProduct,
+} from "./products.types";
+import { config } from "../../config/config";
+import { OrderBy } from "./products.enum";
 
-export const findAllProducts = async () => {
-	const result = await db
-		.select({
-			id: products.id,
-			name: products.name,
-			description: products.description,
-			price: products.price,
-			sku: products.sku,
-			quantity: products.qty,
+/**
+ * Retrieves a list of products based on the provided query parameters.
+ *
+ * @param {FindAllProductsQuery} query - The query parameters to filter products by.
+ * @return {Promise<unknown[]>} An array of products that match the query parameters.
+ */
+const findAllProducts = async (query: FindAllProductsQuery) => {
+	const page = Number(query.page) || config.pagination.page;
+	const limit = Number(query.limit) || config.pagination.limit;
+	const supplierId = Number(query.supplierId);
+	const categoryId = Number(query.categoryId);
+	const sectionId = Number(query.sectionId);
 
-			sectionName: sections.name,
-			categoryName: categories.name,
-			supplierName: suppliers.name,
-			screenshots: sql`array_agg(${productScreenshots.url})`.as("screenshots"),
-		})
-		.from(products)
-		.leftJoin(sections, eq(products.categoryId, sections.id))
-		.leftJoin(categories, eq(products.categoryId, categories.id))
-		.leftJoin(suppliers, eq(products.supplierId, suppliers.id))
-		.leftJoin(productScreenshots, eq(products.id, productScreenshots.productId))
-		.groupBy(products.id, sections.name, categories.name, suppliers.name);
+	const { status } = query;
 
-	return result;
+	const andConditions: SQL<unknown>[] = [];
+
+	const queryOptions: DBQueryConfig = {
+		with: {
+			category: {
+				columns: {
+					name: true,
+				},
+			},
+			section: {
+				columns: {
+					name: true,
+				},
+			},
+			supplier: {
+				columns: {
+					name: true,
+				},
+			},
+			screenshots: {
+				columns: {
+					url: true,
+				},
+			},
+		},
+
+		limit: limit,
+		offset: (page - 1) * limit,
+	};
+
+	if (supplierId) {
+		andConditions.push(eq(products.supplierId, supplierId));
+	}
+
+	if (categoryId) {
+		andConditions.push(eq(products.categoryId, categoryId));
+	}
+
+	if (sectionId) {
+		andConditions.push(eq(products.sectionId, sectionId));
+	}
+
+	if (status) {
+		andConditions.push(eq(products.status, status));
+	}
+
+	if (query.sortBy) {
+		if (query.sortBy && query.orderBy === OrderBy.DESC) {
+			queryOptions.orderBy = [desc(products[query.sortBy])];
+		} else {
+			queryOptions.orderBy = [asc(products[query.sortBy])];
+		}
+	}
+
+	queryOptions.where = and(...andConditions);
+
+	const allPproducts = await db.query.products.findMany({
+		with: {},
+	});
+
+	return allPproducts;
 };
 
-export const findProductById = async (id: number) => {
-	const result = await db
-		.select({
-			id: products.id,
-			name: products.name,
-			description: products.description,
-			price: products.price,
-			sku: products.sku,
-			quantity: products.qty,
+/**
+ * Retrieves a product by its ID, including its category, section, supplier, and screenshots.
+ *
+ * @param {number} id - The ID of the product to retrieve.
+ * @return {Promise<unknown>} The product data, or null if not found.
+ */
+const findProductById = async (id: number) => {
+	const product = await db.query.products.findFirst({
+		where: eq(products.id, id),
 
-			sectionName: sections.name,
-			categoryName: categories.name,
-			supplierName: suppliers.name,
-			supplierId: suppliers.id,
-			screenshots: sql`array_agg(${productScreenshots.url})`.as("screenshots"),
-		})
-		.from(products)
-		.leftJoin(sections, sql`${products.sectionId} = ${sections.id}`)
-		.leftJoin(categories, sql`${products.categoryId} = ${categories.id}`)
-		.leftJoin(suppliers, sql`${products.supplierId} = ${suppliers.id}`)
-		.leftJoin(
-			productScreenshots,
-			sql`${products.id} = ${productScreenshots.productId}`
-		)
-		.where(sql`${products.id} = ${id}`)
-		.groupBy(
-			products.id,
-			sections.name,
-			categories.name,
-			suppliers.name,
-			suppliers.id
-		)
-		.limit(1);
+		with: {
+			category: {
+				columns: {
+					name: true,
+				},
+			},
+			section: {
+				columns: {
+					name: true,
+				},
+			},
+			supplier: {
+				columns: {
+					name: true,
+				},
+			},
+			screenshots: {
+				columns: {
+					url: true,
+				},
+			},
+		},
+	});
 
-	return result[0] || null;
+	return product;
 };
 
-export const insertProduct = async (productData: CreateProduct) => {
+/**
+ * Inserts a new product into the database.
+ *
+ * @param {CreateProduct} productData - The product data to be inserted.
+ * @return {unknown} The created product data.
+ */
+const insertProduct = async (productData: CreateProduct) => {
 	const createdProduct = await db
 		.insert(products)
-		.values(productData as any) // eslint-disable-line
+		.values(productData)
 		.returning();
 
 	return createdProduct[0];
 };
 
-export const updateProduct = async (id: number, productData: UpdateProduct) => {
+/**
+ * Updates a product in the database by its ID.
+ *
+ * @param {number} id - The ID of the product to update.
+ * @param {UpdateProduct} productData - The updated product data.
+ * @return {unknown} The updated product data.
+ */
+const updateProduct = async (id: number, productData: UpdateProduct) => {
 	return await db
 		.update(products)
-		.set(productData as any) // eslint-disable-line
+		.set(productData)
 		.where(eq(products.id, id))
 		.returning();
 };
 
-export const deleteProduct = async (id: number) => {
+/**
+ * Deletes a product from the database by its ID.
+ *
+ * @param {number} id - The ID of the product to be deleted.
+ * @return {unknown} The result of the deletion operation.
+ */
+const deleteProduct = async (id: number) => {
 	return await db.delete(products).where(eq(products.id, id)).execute();
+};
+
+export default {
+	findAllProducts,
+	findProductById,
+	insertProduct,
+	updateProduct,
+	deleteProduct,
 };

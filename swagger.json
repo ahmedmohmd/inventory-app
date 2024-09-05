@@ -355,6 +355,168 @@
 					}
 				}
 			}
+		},
+
+		"/products": {
+			"get": {
+				"summary": "Retrieve a list of products",
+				"description": "Returns a list of all products in the system",
+				"tags": ["Products"],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "page",
+						"description": "The page number",
+						"type": "integer"
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"description": "The number of products per page",
+						"type": "integer"
+					},
+					{
+						"in": "query",
+						"name": "supplierId",
+						"description": "The ID of the supplier",
+						"type": "integer"
+					},
+					{
+						"in": "query",
+						"name": "categoryId",
+						"description": "The ID of the category",
+						"type": "integer"
+					},
+					{
+						"in": "query",
+						"name": "sectionId",
+						"description": "The ID of the section",
+						"type": "integer"
+					},
+					{
+						"in": "query",
+						"name": "status",
+						"description": "The status of the product",
+						"type": "string"
+					},
+					{
+						"in": "query",
+						"name": "sortBy",
+						"description": "The field to sort by",
+						"type": "string"
+					},
+					{
+						"in": "query",
+						"name": "orderBy",
+						"description": "The order of the sort",
+						"type": "string"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "A list of products",
+						"schema": {
+							"type": "array",
+							"items": {
+								"$ref": "#/definitions/Product"
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"summary": "Create a new product",
+				"description": "Creates a new product in the system",
+				"tags": ["Products"],
+				"parameters": [
+					{
+						"in": "body",
+						"name": "product",
+						"description": "The product to create",
+						"schema": {
+							"$ref": "#/definitions/CreateProduct"
+						}
+					}
+				],
+				"responses": {
+					"201": {
+						"description": "The created product",
+						"schema": {
+							"$ref": "#/definitions/Product"
+						}
+					}
+				}
+			}
+		},
+		"/products/{id}": {
+			"get": {
+				"summary": "Retrieve a product by ID",
+				"description": "Returns a product by its ID",
+				"tags": ["Products"],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"description": "The ID of the product",
+						"required": true,
+						"type": "integer"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The product",
+						"schema": {
+							"$ref": "#/definitions/Product"
+						}
+					}
+				}
+			},
+			"patch": {
+				"summary": "Update a product",
+				"description": "Updates a product in the system",
+				"tags": ["Products"],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"description": "The ID of the product",
+						"required": true,
+						"type": "integer"
+					},
+					{
+						"in": "body",
+						"name": "product",
+						"description": "The updated product",
+						"schema": {
+							"$ref": "#/definitions/UpdateProduct"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "The product was updated successfully"
+					}
+				}
+			},
+			"delete": {
+				"summary": "Delete a product",
+				"description": "Deletes a product by its ID",
+				"tags": ["Products"],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"description": "The ID of the product",
+						"required": true,
+						"type": "integer"
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "The product was deleted successfully"
+					}
+				}
+			}
 		}
 	},
 
@@ -502,6 +664,137 @@
 				},
 				"address": {
 					"type": "string"
+				}
+			}
+		},
+
+		"Product": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"price": {
+					"type": "number"
+				},
+				"categoryId": {
+					"type": "integer"
+				},
+				"supplierId": {
+					"type": "integer"
+				},
+				"sectionId": {
+					"type": "integer"
+				},
+				"status": {
+					"type": "string"
+				},
+				"qty": {
+					"type": "integer"
+				},
+
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				}
+			},
+			"required": [
+				"id",
+				"name",
+				"description",
+				"price",
+				"qty",
+				"categoryId",
+				"supplierId",
+				"sectionId",
+				"status",
+				"createdAt",
+				"updatedAt"
+			]
+		},
+		"CreateProduct": {
+			"type": "object",
+			"properties": {
+				"name": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"price": {
+					"type": "number"
+				},
+				"qty": {
+					"type": "integer"
+				},
+				"categoryId": {
+					"type": "integer"
+				},
+				"supplierId": {
+					"type": "integer"
+				},
+				"sectionId": {
+					"type": "integer"
+				},
+				"status": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"name",
+				"description",
+				"price",
+				"qty",
+				"categoryId",
+				"supplierId",
+				"sectionId",
+				"status"
+			]
+		},
+		"UpdateProduct": {
+			"type": "object",
+			"properties": {
+				"name": {
+					"type": "string",
+					"nullable": true
+				},
+				"description": {
+					"type": "string",
+					"nullable": true
+				},
+				"price": {
+					"type": "number",
+					"nullable": true
+				},
+				"qty": {
+					"type": "integer",
+					"nullable": true
+				},
+				"categoryId": {
+					"type": "integer",
+					"nullable": true
+				},
+				"supplierId": {
+					"type": "integer",
+					"nullable": true
+				},
+				"sectionId": {
+					"type": "integer",
+					"nullable": true
+				},
+				"status": {
+					"type": "string",
+					"nullable": true
 				}
 			}
 		}

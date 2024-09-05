@@ -33,7 +33,7 @@ export const productScreenshots = pgTable("product_screenshots", {
 export const productScreenshotsRelations = relations(
 	productScreenshots,
 	({ one }) => ({
-		products: one(products, {
+		product: one(products, {
 			fields: [productScreenshots.productId],
 			references: [products.id],
 		}),

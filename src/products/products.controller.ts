@@ -1,22 +1,41 @@
 import { RequestHandler } from "express";
 import { StatusCodes } from "http-status-codes";
-import * as productsService from "./products.service";
+import productsService from "./products.service";
 
-export const getAllProducts: RequestHandler = async (req, res) => {
-	const allProducts = await productsService.findAllProducts();
+/**
+ * Retrieves a list of all products based on the provided query parameters.
+ *
+ * @param {object} query - The query parameters to filter products by.
+ * @return {object} An object containing a list of products.
+ */
+const getAllProducts: RequestHandler = async ({ query }, res) => {
+	const products = await productsService.findAllProducts(query);
 
-	return res.status(StatusCodes.OK).json(allProducts);
+	return res.status(StatusCodes.OK).json(products);
 };
 
-export const getSingleProduct: RequestHandler = async ({ params }, res) => {
-	const targetProduct = await productsService.findProductById(
-		Number(params.id)
-	);
+/**
+ * Retrieves a product by its ID.
+ *
+ * @param {object} params - The request parameters containing the product ID.
+ * @return {object} An object containing the retrieved product.
+ */
+const getSingleProduct: RequestHandler = async ({ params }, res) => {
+	const { id } = params;
 
-	res.status(StatusCodes.OK).json(targetProduct);
+	const product = await productsService.findProductById(Number(id));
+
+	return res.status(StatusCodes.OK).json(product);
 };
 
-export const createProduct: RequestHandler = async (req, res) => {
+/**
+ * Creates a new product by inserting it into the database.
+ *
+ * @param {object} req - The Express request object containing the product data and images.
+ * @param {object} res - The Express response object used to send the newly created product data.
+ * @return {object} An object containing the newly created product data.
+ */
+const createProduct: RequestHandler = async (req, res) => {
 	const productData = req.body;
 	const productImages = req.files as Express.Multer.File[];
 
@@ -28,22 +47,41 @@ export const createProduct: RequestHandler = async (req, res) => {
 	return res.status(StatusCodes.CREATED).json(createdProduct);
 };
 
-export const updateProduct: RequestHandler = async (req, res) => {
+/**
+ * Updates a product by its ID.
+ *
+ * @param {object} req - The Express request object containing the product ID and updated product data.
+ * @param {object} res - The Express response object used to send the result of the update operation.
+ * @return {void} No data is returned, but a CREATED status code is sent to indicate success.
+ */
+const updateProduct: RequestHandler = async (req, res) => {
 	const { id } = req.params;
 	const productData = req.body;
 
-	const updatedProduct = await productsService.updateProduct(
-		Number(id),
-		productData
-	);
+	await productsService.updateProduct(Number(id), productData);
 
-	return res.status(StatusCodes.CREATED).json(updatedProduct);
+	return res.status(StatusCodes.CREATED).send();
 };
 
-export const deleteProduct: RequestHandler = async (req, res) => {
+/**
+ * Deletes a product from the database.
+ *
+ * @param {object} req - The Express request object containing the product ID as a path parameter.
+ * @param {object} res - The Express response object used to send the response.
+ * @return {void} No data is returned, but a NO_CONTENT status code is sent to indicate success.
+ */
+const deleteProduct: RequestHandler = async (req, res) => {
 	const { id } = req.params;
 
 	await productsService.deleteProduct(Number(id));
 
-	return res.status(StatusCodes.NO_CONTENT);
+	return res.status(StatusCodes.NO_CONTENT).send();
+};
+
+export default {
+	getAllProducts,
+	getSingleProduct,
+	createProduct,
+	updateProduct,
+	deleteProduct,
 };

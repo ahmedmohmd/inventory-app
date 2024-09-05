@@ -1,11 +1,10 @@
 import createHttpError from "http-errors";
-import { findProductById } from "../products/products.service";
 import ordersRepository from "./orders.repository";
 import { CreateOrder, FindAllOrdersQuery } from "./orders.types";
 import { OrderStatus } from "./orders.enum";
 import { config } from "../../config/config";
-import * as productService from "../products/products.service";
 import orderItems from "../order-items";
+import productsModule from "../products";
 
 /**
  * Retrieves a list of orders based on the provided query parameters.
@@ -62,7 +61,7 @@ const findOrderById = async (id: number) => {
  */
 const insertOrder = async (data: CreateOrder) => {
 	const productPromises = data.items.map((item) =>
-		findProductById(item.productId)
+		productsModule.service.findProductById(item.productId)
 	);
 	const products = await Promise.all(productPromises);
 
@@ -132,7 +131,7 @@ const changeOrderState = async (orderId: number, status: OrderStatus) => {
 	const updateResult = await ordersRepository.changeOrderState(orderId, status);
 
 	const productsPromises = order.orderItems.map((item) =>
-		findProductById(item.productId)
+		productsModule.service.findProductById(item.productId)
 	);
 	const products = await Promise.all(productsPromises);
 
@@ -143,8 +142,8 @@ const changeOrderState = async (orderId: number, status: OrderStatus) => {
 			throw new createHttpError.BadRequest("Product not found");
 		}
 
-		return productService.updateProduct(item.productId, {
-			qty: product.quantity + item.quantity,
+		return productsModule.service.updateProduct(item.productId, {
+			qty: product.qty + item.quantity,
 		});
 	});
 

@@ -11,6 +11,7 @@ import { categories } from "./category.schema";
 import { sections } from "./section.schema";
 // import { stocks } from "./stock.schema";
 import { suppliers } from "./supplier.schema";
+import { productScreenshots } from "./product-screenshot.schema";
 
 export const productStatus = pgEnum("product_status", [
 	"reserved",
@@ -69,7 +70,7 @@ export const products = pgTable("products", {
 		.$onUpdate(() => new Date()),
 });
 
-export const productsRelations = relations(products, ({ one }) => ({
+export const productsRelations = relations(products, ({ one, many }) => ({
 	category: one(categories, {
 		fields: [products.categoryId],
 		references: [categories.id],
@@ -84,6 +85,8 @@ export const productsRelations = relations(products, ({ one }) => ({
 		fields: [products.sectionId],
 		references: [sections.id],
 	}),
+
+	screenshots: many(productScreenshots),
 
 	// stocks: many(stocks),
 }));

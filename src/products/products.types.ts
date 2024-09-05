@@ -1,3 +1,5 @@
+import { OrderBy, ProductStatus, SortBy } from "./products.enum";
+
 type CreateProduct = {
 	name: string;
 	description: string;
@@ -7,10 +9,20 @@ type CreateProduct = {
 	supplierId: number;
 	categoryId: number;
 	sectionId: number;
-
 	qty: number;
 };
 
 type UpdateProduct = Partial<CreateProduct>;
 
-export { CreateProduct, UpdateProduct };
+type FindAllProductsQuery = {
+	page?: number;
+	limit?: number;
+	supplierId?: number;
+	sectionId?: number;
+	categoryId?: number;
+	status?: ProductStatus;
+	sortBy?: SortBy;
+	orderBy?: OrderBy;
+};
+
+export { CreateProduct, UpdateProduct, FindAllProductsQuery };

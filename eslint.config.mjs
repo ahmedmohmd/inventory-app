@@ -52,7 +52,7 @@ export default [
 			],
 			"max-lines-per-function": [
 				"warn",
-				{ max: 50, skipBlankLines: true, skipComments: true },
+				{ max: 80, skipBlankLines: true, skipComments: true },
 			],
 			"max-params": ["warn", { max: 4 }],
 			"new-cap": ["warn", { newIsCap: true, capIsNew: false }],
