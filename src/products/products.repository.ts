@@ -80,9 +80,7 @@ const findAllProducts = async (query: FindAllProductsQuery) => {
 
 	queryOptions.where = and(...andConditions);
 
-	const allPproducts = await db.query.products.findMany({
-		with: {},
-	});
+	const allPproducts = await db.query.products.findMany(queryOptions);
 
 	return allPproducts;
 };
