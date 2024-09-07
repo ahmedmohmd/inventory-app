@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { Role } from "../common/enums/user-role.enum";
 
 const createUserSchema = z.object({
 	email: z.string().email(),
@@ -16,4 +17,16 @@ const userIdSchema = z.object({
 	id: z.string().regex(/^\d+$/),
 });
 
-export { createUserSchema, updateUserSchema, userIdSchema };
+const UserRoleSchema = z.enum([Role.ADMIN, Role.EMPLOYEE]);
+
+const findAllUsersQuerySchema = z.object({
+	role: UserRoleSchema.optional(),
+	active: z.boolean().optional(),
+});
+
+export default {
+	createUserSchema,
+	userIdSchema,
+	updateUserSchema,
+	findAllUsersQuerySchema,
+};

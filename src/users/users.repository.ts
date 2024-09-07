@@ -1,13 +1,13 @@
-import { eq } from "drizzle-orm";
+import { and, DBQueryConfig, eq, SQL } from "drizzle-orm";
 import { db } from "../db";
 import { users } from "../db/schema/user.schema";
-import { CreateUser, UpdateUser } from "./users.types";
+import { CreateUser, FindAllUsersQuery, UpdateUser } from "./users.types";
 
 /**
- * Retrieves a user from the database by their unique identifier.
+ * Finds a user by their ID.
  *
- * @param {number} id - The unique identifier of the user to retrieve.
- * @return {Promise<User>} The user object if found, or undefined if not found.
+ * @param {number} id - The ID of the user.
+ * @return {Promise<User | null>} A Promise that resolves to the user with the given ID, or null if not found.
  */
 const findUserById = async (id: number) => {
 	return await db.query.users.findFirst({
@@ -19,7 +19,7 @@ const findUserById = async (id: number) => {
  * Retrieves a user from the database by their email address.
  *
  * @param {string} email - The email address of the user to retrieve.
- * @return {Promise<User>} The user object if found, or undefined if not found.
+ * @return {Promise<User | null>} A Promise that resolves to the user object if found, or null if not found.
  */
 const findUserByEmail = async (email: string) => {
 	return await db.query.users.findFirst({
@@ -28,12 +28,27 @@ const findUserByEmail = async (email: string) => {
 };
 
 /**
- * Retrieves all users from the database.
+ * Retrieves a list of users from the database based on the provided query parameters.
  *
- * @return {Promise<User[]>} An array of user objects.
+ * @param {FindAllUsersQuery} query - An object containing query parameters to filter users.
+ * @return {Promise<User[]>} A Promise that resolves to an array of user objects.
  */
-const findAllUsers = async () => {
-	return await db.select().from(users);
+const findAllUsers = async ({ active, role }: FindAllUsersQuery) => {
+	const andConditions: SQL<unknown>[] = [];
+
+	if (active) {
+		andConditions.push(eq(users.isActive, active));
+	}
+
+	if (role) {
+		andConditions.push(eq(users.role, role));
+	}
+
+	const queryOptions: DBQueryConfig = {
+		where: and(...andConditions),
+	};
+
+	return await db.query.users.findMany(queryOptions);
 };
 
 /**
@@ -47,8 +62,9 @@ const insertUser = async (userData: CreateUser) => {
 		id: users.id,
 		name: users.name,
 		email: users.email,
-		password: users.password,
 		role: users.role,
+		profileImage: users.profileImage,
+		isActive: users.isActive,
 		createdAt: users.createdAt,
 		updatedAt: users.updatedAt,
 	});
@@ -57,33 +73,36 @@ const insertUser = async (userData: CreateUser) => {
 };
 
 /**
- * Updates a user in the database with the provided user data.
+ * Updates a user in the database.
  *
- * @param {number} id - The ID of the user to update.
- * @param {UpdateUser} userData - The data to update the user with.
- * @return {void}
+ * @param {number} id - The ID of the user to be updated.
+ * @param {UpdateUser} userData - The updated user data.
+ * @return {Promise<User>} The updated user object.
  */
 const updateUser = async (id: number, userData: UpdateUser) => {
-	for (const field of Object.keys(userData)) {
-		// eslint-disable-next-line
-		await db
-			.update(users)
-			.set({ [field]: userData[field as keyof UpdateUser] });
-	}
-
-	return;
+	return await db
+		.update(users)
+		.set(userData)
+		.where(eq(users.id, id))
+		.returning();
 };
 
 /**
  * Deletes a user from the database.
  *
- * @param {number} id - The ID of the user to delete.
- * @return {Promise<void>} The result of the deletion operation.
+ * @param {number} id - The ID of the user to be deleted.
+ * @return {Promise<void>} A promise that resolves when the deletion is complete.
  */
 const deleteUser = async (id: number) => {
 	return await db.delete(users).where(eq(users.id, id)).execute();
 };
 
+/**
+ * Finds a user by their reset password token.
+ *
+ * @param {string} resetToken - The reset password token of the user.
+ * @return {Promise<User | null>} A Promise that resolves to the user with the given reset password token, or null if not found.
+ */
 const findUserByResetToken = async (resetToken: string) => {
 	return await db.query.users.findFirst({
 		where: eq(users.resetPasswordToken, resetToken),

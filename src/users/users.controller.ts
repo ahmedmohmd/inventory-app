@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import { HttpStatusCode } from "../common/enums/http-status-code.enum";
-import * as usersService from "./users.service";
+import usersService from "./users.service";
 import { UpdateUser } from "./users.types";
 
 /**
@@ -10,8 +10,9 @@ import { UpdateUser } from "./users.types";
  * @param {Response} res - The outgoing HTTP response.
  * @return {Promise<User[]>} A promise that resolves when the response is sent.
  */
-const getAllUsers: RequestHandler = async (req, res) => {
-	const allUsers = await usersService.findAllUsers();
+const getAllUsers: RequestHandler = async ({ query }, res) => {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const allUsers = await usersService.findAllUsers(query as any);
 
 	res.status(HttpStatusCode.OK).json(allUsers);
 };
@@ -64,4 +65,4 @@ const deleteUser: RequestHandler = async (req, res) => {
 	res.status(HttpStatusCode.NO_CONTENT).json(true);
 };
 
-export { deleteUser, getAllUsers, getSingleUser, updateUser };
+export default { deleteUser, getAllUsers, getSingleUser, updateUser };

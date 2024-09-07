@@ -3,7 +3,7 @@ import { hashPassword } from "../auth/utils/password-hash.util";
 import { removeImage, uploadImage } from "../common/utils/image-upload";
 import logger from "../logging";
 import usersRepository from "./users.repository";
-import { CreateUser, UpdateUser } from "./users.types";
+import { CreateUser, FindAllUsersQuery, UpdateUser } from "./users.types";
 
 /**
  * Retrieves a user by their unique identifier.
@@ -12,7 +12,6 @@ import { CreateUser, UpdateUser } from "./users.types";
  * @return {object} The user object associated with the provided ID.
  */
 const findUserById = async (id: number) => {
-	logger.general.info(`Calling for findUserById() Method.`);
 	const targetUser = await usersRepository.findUserById(id);
 
 	if (!targetUser) {
@@ -30,18 +29,17 @@ const findUserById = async (id: number) => {
  * @return {Promise<User>} The user object if found, or undefined if not found.
  */
 const findUserByEmail = async (email: string) => {
-	logger.general.info(`Calling for findUserByEmail() Method.`);
 	return await usersRepository.findUserByEmail(email);
 };
 
 /**
- * Retrieves all users.
+ * Retrieves all users from the database based on the provided query parameters.
  *
- * @return {array} An array of user objects.
+ * @param {FindAllUsersQuery} query - An object containing query parameters to filter users.
+ * @return {Promise<User[]>} A Promise that resolves to an array of user objects.
  */
-const findAllUsers = async () => {
-	logger.general.info(`Calling for findAllUsers() Method from Users Service.`);
-	return await usersRepository.findAllUsers();
+const findAllUsers = async (query: FindAllUsersQuery) => {
+	return await usersRepository.findAllUsers(query);
 };
 
 /**
@@ -55,8 +53,6 @@ const insertUser = async (
 	userData: CreateUser,
 	profileImage: Express.Multer.File | null
 ) => {
-	logger.general.info(`Calling for insertUser() Method from Users Service.`);
-
 	const targetUser = await usersRepository.findUserByEmail(userData.email);
 
 	if (targetUser) {
@@ -86,11 +82,9 @@ const updateUser = async (
 	userData: UpdateUser,
 	profileImage?: Express.Multer.File
 ) => {
-	logger.general.info(`Calling for updateUser() Method.`);
 	const targetUser = await usersRepository.findUserById(id);
 
 	if (!targetUser) {
-		logger.errors.error(`User with Id: ${id} not Found Exception.`);
 		throw new createHttpError.NotFound(`User with Id: ${id} not Found.`);
 	}
 
@@ -119,11 +113,9 @@ const findUserByResetToken = async (resetToken: string) => {
 };
 
 const deleteUser = async (id: number) => {
-	logger.general.info(`Calling for deleteUser() Method.`);
 	const targetUser = await usersRepository.findUserById(id);
 
 	if (!targetUser) {
-		logger.errors.error(`User with Id: ${id} not Found Exception.`);
 		throw new createHttpError.NotFound(`User with Id: ${id} not Found.`);
 	}
 
@@ -133,7 +125,7 @@ const deleteUser = async (id: number) => {
 	return;
 };
 
-export {
+export default {
 	deleteUser,
 	findAllUsers,
 	findUserByEmail,

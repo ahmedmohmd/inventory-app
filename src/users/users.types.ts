@@ -11,4 +11,9 @@ type UpdateUser = Partial<CreateUser> & {
 	resetPasswordToken?: string;
 };
 
-export { CreateUser, UpdateUser };
+type FindAllUsersQuery = {
+	role: Role;
+	active: boolean;
+};
+
+export { CreateUser, UpdateUser, FindAllUsersQuery };

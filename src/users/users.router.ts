@@ -5,42 +5,42 @@ import { authenticate } from "../common/middleware/authenticate.middleware";
 import { upload } from "../common/middleware/multer.middleware";
 import { validateRequestBody } from "../common/middleware/validate-request-body.middleware";
 import { validateRequestParams } from "../common/middleware/validate-request-params.middleware";
-import {
-	deleteUser,
-	getAllUsers,
-	getSingleUser,
-	updateUser,
-} from "./users.controller";
-import { updateUserSchema, userIdSchema } from "./users.validation-schema";
+import usersController from "./users.controller";
+import usersValidationSchema from "./users.validation-schema";
 
 const router = express.Router();
 
-router.get("/", authenticate, authUserRoles(Role.ADMIN), getAllUsers);
+router.get(
+	"/",
+	authenticate,
+	authUserRoles(Role.ADMIN),
+	usersController.getAllUsers
+);
 
 router.get(
 	"/:id",
 	authenticate,
 	authUserRoles(Role.ADMIN),
-	validateRequestParams(userIdSchema),
-	getSingleUser
+	validateRequestParams(usersValidationSchema.userIdSchema),
+	usersController.getSingleUser
 );
 
 router.patch(
 	"/:id",
 	authenticate,
-	validateRequestParams(userIdSchema),
+	validateRequestParams(usersValidationSchema.userIdSchema),
 	authUserRoles(Role.ADMIN),
-	validateRequestBody(updateUserSchema),
+	validateRequestBody(usersValidationSchema.updateUserSchema),
 	upload.single("image"),
-	updateUser
+	usersController.updateUser
 );
 
 router.delete(
 	"/:id",
 	authenticate,
 	authUserRoles(Role.ADMIN),
-	validateRequestParams(userIdSchema),
-	deleteUser
+	validateRequestParams(usersValidationSchema.userIdSchema),
+	usersController.deleteUser
 );
 
 export default router;

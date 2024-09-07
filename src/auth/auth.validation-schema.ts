@@ -17,7 +17,7 @@ const resetPasswordSchema = z.object({
 	password: z.string(),
 });
 
-export {
+export default {
 	resetPasswordQuerySchema,
 	resetPasswordRequestSchema,
 	resetPasswordSchema,
