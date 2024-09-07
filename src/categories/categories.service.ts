@@ -1,6 +1,7 @@
 import createHttpError from "http-errors";
 import categoriesRepository from "./categories.repository";
 import { CreateCategory, UpdateCategory } from "./categories.types";
+import logger from "../logging";
 
 /**
  * Retrieves a category by its ID.
@@ -12,6 +13,7 @@ const findCategoryById = async (id: number) => {
 	const category = await categoriesRepository.findCategoryById(id);
 
 	if (!category) {
+		logger.errors.error(`Category with ID: ${id} not found.`);
 		throw new createHttpError.NotFound(`Category with ID: ${id} not found )`);
 	}
 
@@ -37,6 +39,8 @@ const insertCategory = async (data: CreateCategory) => {
 	const category = await categoriesRepository.findCategoryByName(data.name);
 
 	if (category) {
+		logger.errors.error(`Category with ID: ${category.id} already Exists.`);
+
 		throw new createHttpError.BadRequest(
 			`Category ${data.name} is already Exists.`
 		);
@@ -56,7 +60,8 @@ const updateCategory = async (id: number, data: UpdateCategory) => {
 	const category = await categoriesRepository.findCategoryById(id);
 
 	if (!category) {
-		throw new createHttpError.NotFound(`Category with ID: ${id} not found )`);
+		logger.errors.error(`Category with ID: ${id} not found.`);
+		throw new createHttpError.NotFound(`Category with ID: ${id} not found.`);
 	}
 
 	return await categoriesRepository.updateCategory(id, data);
@@ -72,6 +77,7 @@ const deleteCategory = async (id: number) => {
 	const category = await categoriesRepository.findCategoryById(id);
 
 	if (!category) {
+		logger.errors.error(`Category with ID: ${id} not found.`);
 		throw new createHttpError.NotFound(`Category with ID: ${id} not found )`);
 	}
 

@@ -2,12 +2,12 @@ import createHttpError from "http-errors";
 import { config } from "../../config/config";
 import { ENV } from "../../config/env";
 import logger from "../logging";
-import { sendMail } from "../mail/mail.service";
 import users from "../users";
 
 import { CreateUser } from "../users/users.types";
 import { createJwtToken, decodeJwtToken } from "./utils/jwt.util";
 import { checkPassword } from "./utils/password-hash.util";
+import mail from "../mail";
 
 /**
  * Logs in a user with the provided email and password.
@@ -30,6 +30,14 @@ const login = async (email: string, password: string) => {
 
 	if (!isMatch) {
 		logger.errors.error(`Wrong Password for User: ${email}.`);
+
+		await mail.service.sendMail({
+			from: ENV.SENDER_EMAIL,
+			to: targetUser.email,
+			subject: "Login Try.",
+			text: `There are an login try for your account.`,
+		});
+
 		throw new createHttpError.Unauthorized(`Wrong Password.`);
 	}
 
@@ -53,6 +61,13 @@ const register = async (
 	profileImage: Express.Multer.File | null
 ) => {
 	const createdUser = await users.service.insertUser(userData, profileImage);
+
+	await mail.service.sendMail({
+		from: ENV.SENDER_EMAIL,
+		to: createdUser.email,
+		subject: "Account Created.",
+		text: `Hello, Your account has been created.`,
+	});
 
 	const jwtToken = await createJwtToken({
 		id: createdUser.id,
@@ -101,7 +116,7 @@ const resetPasswordRequest = async (email: string) => {
 		`,
 	};
 
-	await sendMail(mailOptions);
+	await mail.service.sendMail(mailOptions);
 
 	return "Password reset request sent, please check your email.";
 };
@@ -164,7 +179,7 @@ const resetPassword = async (resetToken: string, password: string) => {
 		`,
 	};
 
-	await sendMail(mailOptions);
+	await mail.service.sendMail(mailOptions);
 
 	return "Your password has been successfully reset.";
 };

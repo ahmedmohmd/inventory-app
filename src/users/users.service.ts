@@ -12,14 +12,14 @@ import { CreateUser, FindAllUsersQuery, UpdateUser } from "./users.types";
  * @return {object} The user object associated with the provided ID.
  */
 const findUserById = async (id: number) => {
-	const targetUser = await usersRepository.findUserById(id);
+	const user = await usersRepository.findUserById(id);
 
-	if (!targetUser) {
+	if (!user) {
 		logger.errors.error(`User with Id: ${id} not Found Exception.`);
 		throw new createHttpError.NotFound(`User with Id: ${id} not Found.`);
 	}
 
-	return targetUser;
+	return user;
 };
 
 /**
@@ -53,14 +53,12 @@ const insertUser = async (
 	userData: CreateUser,
 	profileImage: Express.Multer.File | null
 ) => {
-	const targetUser = await usersRepository.findUserByEmail(userData.email);
+	const user = await usersRepository.findUserByEmail(userData.email);
 
-	if (targetUser) {
-		logger.errors.error(
-			`User with Id: ${targetUser.id} already exists Exception.`
-		);
+	if (user) {
+		logger.errors.error(`User with Id: ${user.id} already exists Exception.`);
 		throw new createHttpError.BadRequest(
-			`User with Id: ${targetUser.id} is already exists Found.`
+			`User with Id: ${user.id} is already exists Found.`
 		);
 	}
 
@@ -82,14 +80,16 @@ const updateUser = async (
 	userData: UpdateUser,
 	profileImage?: Express.Multer.File
 ) => {
-	const targetUser = await usersRepository.findUserById(id);
+	const user = await usersRepository.findUserById(id);
 
-	if (!targetUser) {
+	if (!user) {
+		logger.errors.error(`User with Id: ${id} not Found Exception.`);
+
 		throw new createHttpError.NotFound(`User with Id: ${id} not Found.`);
 	}
 
 	if (profileImage) {
-		await removeImage(targetUser.profileImagePublicId);
+		await removeImage(user.profileImagePublicId);
 
 		const uploadedImage = await uploadImage(profileImage, "users-images");
 
@@ -113,13 +113,15 @@ const findUserByResetToken = async (resetToken: string) => {
 };
 
 const deleteUser = async (id: number) => {
-	const targetUser = await usersRepository.findUserById(id);
+	const user = await usersRepository.findUserById(id);
 
-	if (!targetUser) {
+	if (!user) {
+		logger.errors.error(`User with Id: ${id} not Found.`);
+
 		throw new createHttpError.NotFound(`User with Id: ${id} not Found.`);
 	}
 
-	await removeImage(targetUser.profileImagePublicId);
+	await removeImage(user.profileImagePublicId);
 	await usersRepository.deleteUser(id);
 
 	return;

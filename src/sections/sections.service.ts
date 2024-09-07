@@ -1,6 +1,7 @@
 import createHttpError from "http-errors";
 import { CreateSection } from "./section.types";
 import sectionsRepository from "./sections.repository";
+import logger from "../logging";
 
 /**
  * Retrieves all sections from the database.
@@ -21,6 +22,8 @@ const findSectionById = async (id: number) => {
 	const section = await sectionsRepository.findSectionById(id);
 
 	if (!section) {
+		logger.errors.error(`Section with ID: ${id} not Found.`);
+
 		throw new createHttpError.NotFound(`Section with ID: ${id} not Found.`);
 	}
 
@@ -37,6 +40,8 @@ const insertSection = async (data: CreateSection) => {
 	const section = await sectionsRepository.findSectionByName(data.name);
 
 	if (section) {
+		logger.errors.error(`Section with Name: ${data.name} already Exists.`);
+
 		throw new createHttpError.BadRequest(
 			` Section with Name: ${data.name} already Exists.`
 		);
@@ -57,6 +62,8 @@ const updateSection = async (id: number, data: CreateSection) => {
 	const section = await sectionsRepository.findSectionById(id);
 
 	if (!section) {
+		logger.errors.error(`Section with ID: ${id} not Found.`);
+
 		throw new createHttpError.NotFound(`Section with ID: ${id} not Found.`);
 	}
 
@@ -74,6 +81,8 @@ const deleteSection = async (id: number) => {
 	const section = await sectionsRepository.findSectionById(id);
 
 	if (!section) {
+		logger.errors.error(`Section with ID: ${id} not Found.`);
+
 		throw new createHttpError.NotFound(`Section with ID: ${id} not Found.`);
 	}
 
