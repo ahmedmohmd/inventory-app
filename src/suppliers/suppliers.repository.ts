@@ -1,15 +1,23 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { suppliers } from "../db/schema/supplier.schema";
-import { CreateSupplier } from "./suppliers.types";
+import { CreateSupplier, FindAllSuppliersQuery } from "./suppliers.types";
+import { config } from "../../config/config";
 
 /**
  * Retrieves a list of all suppliers from the database.
  *
+ * @param {FindAllSuppliersQuery} query - The query parameters to filter suppliers by.
  * @return {Promise<any[]>} A promise that resolves to an array of supplier objects.
  */
-const findAllSuppliers = async () => {
-	return await db.select().from(suppliers);
+const findAllSuppliers = async (query: FindAllSuppliersQuery) => {
+	const limit = Number(query.limit) || config.pagination.limit;
+	const page = Number(query.page) || config.pagination.page;
+
+	return await db.query.suppliers.findMany({
+		limit: limit,
+		offset: (page - 1) * limit,
+	});
 };
 
 /**
@@ -71,6 +79,15 @@ const deleteSupplier = async (id: number) => {
 	return await db.delete(suppliers).where(eq(suppliers.id, id)).execute();
 };
 
+/**
+ * Retrieves the total number of suppliers in the database.
+ *
+ * @return {number} The total number of suppliers.
+ */
+const countAllSuppliers = async () => {
+	return (await db.query.suppliers.findMany()).length;
+};
+
 export default {
 	deleteSupplier,
 	findAllSuppliers,
@@ -78,4 +95,5 @@ export default {
 	findSupplierById,
 	insertSupplier,
 	updateSupplier,
+	countAllSuppliers,
 };

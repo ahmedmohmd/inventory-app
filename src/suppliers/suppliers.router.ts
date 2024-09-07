@@ -3,10 +3,15 @@ import { validateRequestBody } from "../common/middleware/validate-request-body.
 import { validateRequestParams } from "../common/middleware/validate-request-params.middleware";
 import suppliersController from "./suppliers.controller";
 import suppliersValidationSchema from "./suppliers.validation-schema";
+import { validateRequestQuery } from "../common/middleware/validate-request-query.middleware";
 
 const suppliersRouter = express.Router();
 
-suppliersRouter.get("/", suppliersController.findAllSuppliers);
+suppliersRouter.get(
+	"/",
+	validateRequestQuery(suppliersValidationSchema.findAllSuppliersQuerySchema),
+	suppliersController.findAllSuppliers
+);
 
 suppliersRouter.get(
 	"/:id",

@@ -9,8 +9,8 @@ import suppliersService from "./suppliers.service";
  * @param {Response} res - The Express response object used to send the supplier data.
  * @return {Promise<void>} A promise that resolves when the response is sent.
  */
-const findAllSuppliers: RequestHandler = async (req, res) => {
-	const allSuppliers = await suppliersService.findAllSuppliers();
+const findAllSuppliers: RequestHandler = async ({ query }, res) => {
+	const allSuppliers = await suppliersService.findAllSuppliers(query);
 
 	return res.status(StatusCodes.OK).json(allSuppliers);
 };

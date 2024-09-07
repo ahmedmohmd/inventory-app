@@ -7,4 +7,9 @@ type CreateSupplier = {
 
 type UpdateSupplier = Partial<CreateSupplier>;
 
-export { CreateSupplier, UpdateSupplier };
+type FindAllSuppliersQuery = {
+	page?: number;
+	limit?: number;
+};
+
+export { CreateSupplier, UpdateSupplier, FindAllSuppliersQuery };

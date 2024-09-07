@@ -18,4 +18,14 @@ const supplierIdSchema = z.object({
 	id: z.string().regex(/^\d+$/),
 });
 
-export default { createSupplierSchema, supplierIdSchema, updateSupplierSchema };
+const findAllSuppliersQuerySchema = z.object({
+	limit: z.string().regex(/^\d+$/).optional(),
+	page: z.string().regex(/^\d+$/).optional(),
+});
+
+export default {
+	createSupplierSchema,
+	supplierIdSchema,
+	updateSupplierSchema,
+	findAllSuppliersQuerySchema,
+};

@@ -1,14 +1,30 @@
 import createHttpError from "http-errors";
 import suppliersRepository from "./suppliers.repository";
-import { CreateSupplier } from "./suppliers.types";
+import { CreateSupplier, FindAllSuppliersQuery } from "./suppliers.types";
+import { config } from "../../config/config";
 
-/**
- * Retrieves a list of all suppliers from the suppliers repository.
- *
- * @return {Promise<any[]>} A promise that resolves to an array of supplier objects.
- */
-const findAllSuppliers = async () => {
-	return await suppliersRepository.findAllSuppliers();
+const findAllSuppliers = async (query: FindAllSuppliersQuery) => {
+	const suppliers = await suppliersRepository.findAllSuppliers(query);
+
+	const currentPage = Number(query.page) || config.pagination.page;
+	const pageSize = Number(query.limit) || config.pagination.limit;
+	const totalCount = await suppliersRepository.countAllSuppliers();
+	const totalPages = Math.ceil(totalCount / pageSize);
+	const nextPage = currentPage < totalPages ? currentPage + 1 : null;
+	const prevPage = currentPage > 1 ? currentPage - 1 : null;
+
+	return {
+		pagination: {
+			page_size: pageSize,
+			total_count: totalCount,
+			total_pages: totalPages,
+			current_page: currentPage,
+			next_page: nextPage,
+			prev_page: prevPage,
+		},
+
+		data: suppliers,
+	};
 };
 
 /**
