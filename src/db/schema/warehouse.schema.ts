@@ -1,6 +1,5 @@
 import { InferInsertModel, relations } from "drizzle-orm";
 import { pgTable, serial, timestamp, varchar } from "drizzle-orm/pg-core";
-import { sections } from "./section.schema";
 import { stocks } from "./stock.schema";
 import { orders } from "./order.schema";
 
@@ -28,7 +27,6 @@ export const warehouses = pgTable("warehouses", {
 
 export const warehousesRelations = relations(warehouses, ({ many }) => ({
 	stocks: many(stocks),
-	sections: many(sections),
 	orders: many(orders),
 }));
 

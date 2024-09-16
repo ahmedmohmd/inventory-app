@@ -1,0 +1,170 @@
+
+Table users {
+  id int [pk, increment, not null]
+  name varchar  [not null]
+  email varchar [not null, unique]
+  password varchar [not null]
+  role enum [not null, note: "admin, moderator"]
+  isActive bool [not null, default: false]
+  resetPasswordToken varchar [default: ""]
+  profileImage varchar [default: ""]
+  profileImagePublicId varchar [default: ""]
+  createdAt timestamp [not null, default: "now()"]
+  updateAt timestamp [not null, default: "now()"]
+}
+
+
+Table warehouses {
+  id int [pk, increment, not null]
+  name string [not null]
+  description string [default: ""]
+  location string [not null]
+  createdAt timestamp [not null, default: "now()"]
+  updateAt timestamp [not null, default: "now()"]
+}
+Ref: warehouses.id < stocks.warehouseId
+Ref: warehouses.id < orders.warehouseId
+
+
+// Ref: warehouses.id < sections.warehouseId
+
+
+Table suppliers {
+  id int [pk, increment, not null]
+  name varchar  [not null]
+  email varchar [not null, unique]
+  phone varchar [not null, unique]
+  address varchar [not null]
+
+  createdAt timestamp [not null, default: "now()"]
+  updateAt timestamp [not null, default: "now()"]
+}
+
+Table stocks {
+id Int [pk, increment, not null]
+
+  warehouseId int [not null]
+  productId int [not null]
+  quantity int [not null, default: 0]
+
+
+  createdAt timestamp [not null, default: "now()"]
+
+  updateAt timestamp [not null, default: "now()"]
+}
+// Ref: stocks.warehouseId > warehouses.id
+// Ref: stocks.productId > products.id
+
+
+
+Table sections {
+  id Int [pk, increment, not null]
+  name string [not null]
+  description text [default: ""]
+
+  
+
+
+  createdAt timestamp [not null, default: "now()"]
+
+  updateAt timestamp [not null, default: "now()"]
+
+}
+
+
+Table products {
+    id Int [pk, increment, not null]
+  name varchar [not null]
+  description text [default: ""]
+  price int [not null]
+  status enum [not null]
+  sku varchar [not null]
+
+  categoryId int [not null]
+  supplierId int [not null]
+  sectionId int [not null]
+
+
+  createdAt timestamp [not null, default: "now()"]
+  updateAt timestamp [not null, default: "now()"]
+
+}
+
+// Ref: products.categoryId > categories.id
+Ref: products.supplierId > suppliers.id
+Ref: products.sectionId > sections.id
+
+Ref: products.id < product_screenshots.productId
+Ref: products.id < stocks.productId
+
+
+
+Table product_screenshots {
+      id Int [pk, increment, not null]
+  url varchar [not null]
+
+  publicId varchar [not null]
+
+  productId int [not null]
+
+
+
+createdAt timestamp [not null, default: "now()"]
+  updateAt timestamp [not null, default: "now()"]
+}
+
+Ref: product_screenshots.id > products.id
+
+
+
+
+Table orders {
+id Int [pk, increment, not null]
+
+  status enum [not null]
+
+  total int [not null, default: 0]
+
+  supplierId int [not null]
+  warehouseId int [not null]
+
+  createdAt timestamp [not null, default: "now()"]
+  updateAt timestamp [not null, default: "now()"]
+}
+
+Ref: orders.supplierId > suppliers.id
+// Ref: orders.warehouseId > warehouses.id
+
+Ref: orders.id < order_items.orderId
+
+
+
+
+
+Table order_items {
+    id Int [pk, increment, not null]
+
+    quantity int [not null]
+
+    orderId int [not null]
+    productId int [not null]
+
+    createdAt timestamp [not null, default: "now()"]
+    updateAt timestamp [not null, default: "now()"]
+}
+
+// Ref: order_items.orderId > orders.id
+Ref: order_items.productId > products.id
+
+
+
+
+Table categories {
+    id Int [pk, increment, not null]
+  name varchar [not null]
+  description text [default: ""]
+  createdAt timestamp [not null, default: "now()"]
+  updateAt timestamp [not null, default: "now()"]
+}
+
+Ref: categories.id < products.categoryId
