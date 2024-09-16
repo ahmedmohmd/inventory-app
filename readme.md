@@ -31,7 +31,7 @@ Inventory Management API built with Node.js and TypeScript, providing comprehens
 
 ## 💾 Database Design
 
-<iframe width="560" height="315" src='https://dbdiagram.io/e/66752fb95a764b3c720e3f9e/66e866e46dde7f4149461f27'> </iframe>
+[Preview](https://dbdiagram.io/d/Inventory-App-66752fb95a764b3c720e3f9e)
 
 ## 📘 API Documentation
 
