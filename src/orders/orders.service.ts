@@ -7,6 +7,10 @@ import orderItems from "../order-items";
 import productsModule from "../products";
 import logger from "../logging";
 import stocks from "../stocks";
+import mail from "../mail";
+import users from "../users";
+import { Role } from "../common/enums/user-role.enum";
+import { ENV } from "../../config/env";
 
 /**
  * Retrieves a list of orders based on the provided query parameters.
@@ -176,6 +180,18 @@ const changeOrderState = async (orderId: number, status: OrderStatus) => {
 	if (status === OrderStatus.COMPLETED) {
 		await Promise.all(updateProductsQuantity);
 	}
+
+	const adminUsers = await users.service.findUsersByRole(Role.ADMIN);
+	const sendMailsPromises = adminUsers.map((user) => {
+		mail.service.sendMail({
+			from: ENV.SENDER_EMAIL,
+			to: user.email,
+			subject: "Order Status Changed",
+			text: `The status of the order with ID: ${order.id} has been changed to: ${status}.`,
+		});
+	});
+
+	await Promise.all(sendMailsPromises);
 
 	return updateResult;
 };

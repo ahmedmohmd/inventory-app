@@ -4,6 +4,7 @@ import { removeImage, uploadImage } from "../common/utils/image-upload";
 import logger from "../logging";
 import usersRepository from "./users.repository";
 import { CreateUser, FindAllUsersQuery, UpdateUser } from "./users.types";
+import { Role } from "../common/enums/user-role.enum";
 
 /**
  * Retrieves a user by their unique identifier.
@@ -40,6 +41,16 @@ const findUserByEmail = async (email: string) => {
  */
 const findAllUsers = async (query: FindAllUsersQuery) => {
 	return await usersRepository.findAllUsers(query);
+};
+
+/**
+ * Retrieves a list of users from the database based on their role.
+ *
+ * @param {Role} role - The role of the users to retrieve.
+ * @return {Promise<User[]>} A Promise that resolves to an array of user objects.
+ */
+const findUsersByRole = async (role: Role) => {
+	return await usersRepository.findUsersByRole(role);
 };
 
 /**
@@ -135,4 +146,5 @@ export default {
 	findUserByResetToken,
 	insertUser,
 	updateUser,
+	findUsersByRole,
 };

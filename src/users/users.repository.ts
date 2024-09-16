@@ -2,6 +2,7 @@ import { and, DBQueryConfig, eq, SQL } from "drizzle-orm";
 import { db } from "../db";
 import { users } from "../db/schema/user.schema";
 import { CreateUser, FindAllUsersQuery, UpdateUser } from "./users.types";
+import { Role } from "../common/enums/user-role.enum";
 
 /**
  * Finds a user by their ID.
@@ -24,6 +25,18 @@ const findUserById = async (id: number) => {
 const findUserByEmail = async (email: string) => {
 	return await db.query.users.findFirst({
 		where: eq(users.email, email),
+	});
+};
+
+/**
+ * Retrieves a list of users from the database based on their role.
+ *
+ * @param {Role} role - The role of the users to retrieve.
+ * @return {Promise<User[]>} A Promise that resolves to an array of user objects.
+ */
+const findUsersByRole = async (role: Role) => {
+	return await db.query.users.findMany({
+		where: eq(users.role, role),
 	});
 };
 
@@ -117,4 +130,5 @@ export default {
 	insertUser,
 	updateUser,
 	findUserByResetToken,
+	findUsersByRole,
 };
