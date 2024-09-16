@@ -6,6 +6,7 @@ import { config } from "../../config/config";
 import orderItems from "../order-items";
 import productsModule from "../products";
 import logger from "../logging";
+import stocks from "../stocks";
 
 /**
  * Retrieves a list of orders based on the provided query parameters.
@@ -98,6 +99,7 @@ const insertOrder = async (data: CreateOrder) => {
 		status: OrderStatus.PENDING,
 		total: totalMoney,
 		supplierId: data.supplierId,
+		warehouseId: data.warehouseId,
 	});
 
 	const orderItemsPromises = data.items.map((item) =>
@@ -142,7 +144,7 @@ const changeOrderState = async (orderId: number, status: OrderStatus) => {
 	);
 	const products = await Promise.all(productsPromises);
 
-	const updateProductsQuantity = order.orderItems.map((item) => {
+	const updateProductsQuantity = order.orderItems.map(async (item) => {
 		const product = products.find((product) => product.id === item.productId);
 
 		if (!product) {
@@ -151,8 +153,23 @@ const changeOrderState = async (orderId: number, status: OrderStatus) => {
 			throw new createHttpError.BadRequest("Product not found");
 		}
 
-		return productsModule.service.updateProduct(item.productId, {
-			qty: product.qty + item.quantity,
+		const productStock = await stocks.service.findStockByAllParams(
+			product.id,
+			order.warehouseId
+		);
+
+		if (!productStock) {
+			logger.errors.error(
+				`Stock with Product ID: ${product.id} and Warehouse ID: ${order.warehouseId} not Found.`
+			);
+
+			throw new createHttpError.BadRequest(
+				`Stock with Product ID: ${product.id} and Warehouse ID: ${order.warehouseId} not Found.`
+			);
+		}
+
+		await stocks.service.updateStock(productStock?.id, {
+			quantity: productStock.quantity + item.quantity,
 		});
 	});
 

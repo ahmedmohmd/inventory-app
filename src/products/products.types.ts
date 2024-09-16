@@ -9,7 +9,6 @@ type CreateProduct = {
 	supplierId: number;
 	categoryId: number;
 	sectionId: number;
-	qty: number;
 };
 
 type UpdateProduct = Partial<CreateProduct>;

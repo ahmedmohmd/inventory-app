@@ -8,6 +8,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { orderItems } from "./order-item.schema";
 import { suppliers } from "./supplier.schema";
+import { warehouses } from "./warehouse.schema";
 
 export const OrderStatus = pgEnum("order_status", [
 	"pending",
@@ -31,6 +32,13 @@ export const orders = pgTable("orders", {
 		})
 		.notNull(),
 
+	warehouseId: integer("warehouseId")
+		.notNull()
+		.references(() => warehouses.id, {
+			onDelete: "set null",
+		})
+		.notNull(),
+
 	createdAt: timestamp("createdAt").notNull().defaultNow(),
 	updatedAt: timestamp("updatedAt")
 		.notNull()
@@ -44,6 +52,10 @@ export const ordersRelations = relations(orders, ({ many, one }) => ({
 	supplier: one(suppliers, {
 		fields: [orders.supplierId],
 		references: [suppliers.id],
+	}),
+	warehouse: one(warehouses, {
+		fields: [orders.warehouseId],
+		references: [warehouses.id],
 	}),
 }));
 

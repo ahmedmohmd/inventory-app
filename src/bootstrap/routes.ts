@@ -8,6 +8,7 @@ import orders from "../orders";
 import suppliers from "../suppliers";
 import products from "../products";
 import warehouses from "../warehouses";
+import stocks from "../stocks";
 
 const handleRoutes = (app: Application) => {
 	app.use("/api/v1/auth", auth.router);
@@ -18,6 +19,7 @@ const handleRoutes = (app: Application) => {
 	app.use("/api/v1/products", products.router);
 	app.use("/api/v1/orders", orders.router);
 	app.use("/api/v1/warehouses", warehouses.router);
+	app.use("/api/v1/stocks", stocks.router);
 
 	app.use(globalErrorHandler);
 };

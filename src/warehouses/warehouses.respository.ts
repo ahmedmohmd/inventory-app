@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db";
-import { warehouses } from "../db/schema/warehouse.schema";
 import { CreateWarehouse, UpdateWarehouse } from "./warehouses.types";
+import { warehouses } from "../db/schema/warehouse.schema";
 
 /**
  * Retrieves a list of all warehouses from the database.
@@ -19,7 +19,7 @@ const findWarehouseById = async (id: number) => {
 };
 
 const findWarehouseByName = async (name: string) => {
-	return await db.query.sections.findFirst({
+	return await db.query.warehouses.findFirst({
 		where: eq(warehouses.name, name),
 	});
 };

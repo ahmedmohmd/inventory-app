@@ -10,7 +10,6 @@ const createProductSchema = z.object({
 	supplierId: z.string().regex(/^\d+$/),
 	categoryId: z.string().regex(/^\d+$/),
 	sectionId: z.string().regex(/^\d+$/),
-	qty: z.string().regex(/^\d+$/),
 });
 
 const updateProductSchema = z.object({
@@ -22,7 +21,6 @@ const updateProductSchema = z.object({
 	supplierId: z.string().regex(/^\d+$/).optional(),
 	categoryId: z.string().regex(/^\d+$/).optional(),
 	sectionId: z.string().regex(/^\d+$/).optional(),
-	qty: z.string().regex(/^\d+$/).optional(),
 });
 
 const productIdSchema = z.object({

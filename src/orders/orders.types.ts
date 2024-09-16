@@ -8,12 +8,14 @@ export type OrderItem = {
 export type CreateOrder = {
 	supplierId: number;
 	items: OrderItem[];
+	warehouseId: number;
 };
 
 export type IOrder = {
 	total: number;
 	status?: OrderStatus;
 	supplierId: number;
+	warehouseId: number;
 };
 
 export type FindAllOrdersQuery = {

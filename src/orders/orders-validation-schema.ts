@@ -11,6 +11,7 @@ const createOrderSchema = z.object({
 			quantity: z.number(),
 		})
 	),
+	warehouseId: z.number(),
 });
 
 const orderIdSchema = z.object({
