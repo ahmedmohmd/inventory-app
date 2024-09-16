@@ -9,7 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { categories } from "./category.schema";
 import { sections } from "./section.schema";
-// import { stocks } from "./stock.schema";
+import { stocks } from "./stock.schema";
 import { suppliers } from "./supplier.schema";
 import { productScreenshots } from "./product-screenshot.schema";
 
@@ -32,13 +32,6 @@ export const products = pgTable("products", {
 	price: integer("price").notNull(),
 	status: productStatus("status"),
 
-	// screenshot: varchar("screenshot", {
-	// 	length: 255,
-	// }).default(""),
-	// screenshotPublicId: varchar("screenshotPublicId", {
-	// 	length: 255,
-	// }).default(""),
-
 	sku: varchar("sku", {
 		length: 25,
 	}).notNull(),
@@ -60,8 +53,6 @@ export const products = pgTable("products", {
 			onDelete: "set null",
 		})
 		.notNull(),
-
-	qty: integer("quantity").notNull(),
 
 	createdAt: timestamp("createdAt").notNull().defaultNow(),
 	updatedAt: timestamp("updatedAt")
@@ -88,7 +79,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
 
 	screenshots: many(productScreenshots),
 
-	// stocks: many(stocks),
+	stocks: many(stocks),
 }));
 
 export type Product = InferInsertModel<typeof products>;

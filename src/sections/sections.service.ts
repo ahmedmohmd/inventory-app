@@ -1,5 +1,5 @@
 import createHttpError from "http-errors";
-import { CreateSection } from "./section.types";
+import { CreateSection, UpdateSection } from "./section.types";
 import sectionsRepository from "./sections.repository";
 import logger from "../logging";
 
@@ -58,7 +58,7 @@ const insertSection = async (data: CreateSection) => {
  * @return {Promise<CreateSection>} A promise that resolves to the updated section data.
  * @throws {createHttpError.NotFound} If the section with the given ID is not found.
  */
-const updateSection = async (id: number, data: CreateSection) => {
+const updateSection = async (id: number, data: UpdateSection) => {
 	const section = await sectionsRepository.findSectionById(id);
 
 	if (!section) {

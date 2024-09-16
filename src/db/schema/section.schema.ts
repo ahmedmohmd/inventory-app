@@ -7,7 +7,6 @@ import {
 	varchar,
 } from "drizzle-orm/pg-core";
 import { products } from "./product.schema";
-// import { warehouses } from "./warehouse.schema";
 
 export const sectionName = pgEnum("section_name", [
 	"A1",
@@ -29,12 +28,6 @@ export const sections = pgTable("sections", {
 		length: 255,
 	}),
 
-	// warehouseId: integer("warehouseId")
-	// 	.references(() => warehouses.id, {
-	// 		onDelete: "set null",
-	// 	})
-	// 	.notNull(),
-
 	createdAt: timestamp("createdAt").notNull().defaultNow(),
 	updatedAt: timestamp("updatedAt")
 		.notNull()
@@ -44,11 +37,6 @@ export const sections = pgTable("sections", {
 
 export const sectionsRelations = relations(sections, ({ many }) => ({
 	products: many(products),
-
-	// warehouse: one(warehouses, {
-	// 	fields: [sections.warehouseId],
-	// 	references: [warehouses.id],
-	// }),
 }));
 
 export type Section = InferInsertModel<typeof sections>;

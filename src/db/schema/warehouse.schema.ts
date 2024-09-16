@@ -10,6 +10,10 @@ export const warehouses = pgTable("warehouses", {
 		length: 50,
 	}).notNull(),
 
+	description: varchar("description", {
+		length: 255,
+	}),
+
 	location: varchar("location", {
 		length: 255,
 	}).notNull(),

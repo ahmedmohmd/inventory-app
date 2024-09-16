@@ -6,7 +6,6 @@ import { products } from "./product.schema";
 export const orderItems = pgTable("order_items", {
 	id: serial("id").primaryKey(),
 	quantity: integer("quantity").notNull(),
-	// price: integer("price").notNull(),
 
 	orderId: integer("orderId")
 		.notNull()
