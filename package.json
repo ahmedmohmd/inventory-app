@@ -5,8 +5,8 @@
 	"scripts": {
 		"start:dev": "nodemon app.ts",
 		"start:prod": "node ./dist/app.js",
-		"build": "tsc && copyfiles swagger.json dist",
-		"copy": "cpx 'swagger.json' dist",
+		"build": "tsc && copy-swagger",
+		"copy-swagger": "copyfiles swagger.json dist",
 		"format": "prettier . --write",
 		"lint": "eslint .",
 		"test:run": "vitest",
