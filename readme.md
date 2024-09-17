@@ -39,7 +39,7 @@ After you run the App you can find API Docs in route: http://localhost:3000/api-
 
 ## 🔧 Install Instructions
 
-### Using `NPM` Package Manager
+### 📦 Using `NPM` Package Manager
 
 1. Clone the Repo
 
@@ -51,19 +51,55 @@ After you run the App you can find API Docs in route: http://localhost:3000/api-
     cd inventory-app
 ```
 
-2. Install Dependencies
+2. Add Your Desired Environment Variables in `.env` File
+
+```typescript
+// JWT Configs
+JWT_SECRET: string;
+
+// Database ceredintials
+DB_URL: string;
+
+// Email Provider Credentials (Gmail)
+MAIL_USERNAME: string;
+MAIL_PASSWORD: string;
+MAIL_PORT: string;
+MAIL_HOST: string;
+SENDER_EMAIL: string;
+
+// Cloudinary
+CLOUDINARY_CLOUD_NAME: string;
+CLOUDINARY_API_KEY: string;
+CLOUDINARY_API_SECRET: string;
+```
+
+3. Install Dependencies
 
 ```bash
     npm install
 ```
 
-3. Run the APP
+4. Create Database postgres and Called it `inventory`.
+
+   - Open the Temrinal
+   - Write: `psql -U <your username>`
+   - Type your password if desired
+   - write: `create database if not exists inventory`
+   - write: `exit`
+
+5. Apply Drizzle Schema on created Database
+
+```bash
+    npx drizzle-kit push
+```
+
+6. Run the APP
 
 ```bash
     npm run start:dev
 ```
 
-### Using Docker
+### 🐋 Using Docker
 
 1. Clone the Repo
 
@@ -75,10 +111,38 @@ After you run the App you can find API Docs in route: http://localhost:3000/api-
     cd inventory-app
 ```
 
-2. Run Docker Compose Command
+2. Add necessary Environemnt Variables in `docker-compose.yaml` file
+
+```typescript
+// JWT Configs
+JWT_SECRET: string;
+
+// Database ceredintials
+DB_URL: string;
+
+// Email Provider Credentials (Gmail)
+MAIL_USERNAME: string;
+MAIL_PASSWORD: string;
+MAIL_PORT: string;
+MAIL_HOST: string;
+SENDER_EMAIL: string;
+
+// Cloudinary
+CLOUDINARY_CLOUD_NAME: string;
+CLOUDINARY_API_KEY: string;
+CLOUDINARY_API_SECRET: string;
+```
+
+3. Run Docker Compose Command
 
 ```
     docker-compose up
+```
+
+4. Apply `drizzle` schema on the database
+
+```bash
+    docker-compose exec inventory npx drizzle-kit push
 ```
 
 ## 🖥️ Usage
