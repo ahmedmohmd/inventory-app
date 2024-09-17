@@ -4,6 +4,12 @@ import { CreateSupplier, FindAllSuppliersQuery } from "./suppliers.types";
 import { config } from "../../config/config";
 import logger from "../logging";
 
+/**
+ * Retrieves a list of all suppliers with pagination.
+ *
+ * @param {FindAllSuppliersQuery} query - The query parameters to filter suppliers by.
+ * @return {Promise<object>} A promise that resolves to an object containing the supplier data and pagination information.
+ */
 const findAllSuppliers = async (query: FindAllSuppliersQuery) => {
 	const suppliers = await suppliersRepository.findAllSuppliers(query);
 
