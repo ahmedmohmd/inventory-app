@@ -27,7 +27,7 @@ Inventory Management API built with Node.js and TypeScript, providing comprehens
 
 ## 🏗️ Architecture
 
-<img src="./accessories/archeticture.drawio.svg" style="width: 750px; height: 750px;border-radius: 15px;" />
+<img src="./accessories/archeticture.drawio.svg" style="border-radius: 15px;" />
 
 ## 💾 Database Design
 
