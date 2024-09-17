@@ -27,6 +27,9 @@ async function main() {
 	await connectToDatabase();
 	logger.general.info(`connected to database successfully.`);
 
+	// migrate database
+	// await bootstrap.migrateDatabase();
+
 	app.listen(port, () => {
 		logger.general.info(`listening on ${config.apiEndPoint}.`);
 	});

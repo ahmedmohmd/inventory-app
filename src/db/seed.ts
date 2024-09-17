@@ -13,7 +13,7 @@ const seedDataBase = async () => {
 
 	// insert fake category
 	await db.insert(categories).values({
-		name: "Electronics",
+		name: "games",
 		description: "Electronics category.",
 	});
 };

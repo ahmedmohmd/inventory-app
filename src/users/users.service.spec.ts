@@ -1,13 +1,9 @@
 import createHttpError from "http-errors";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import usersRepository from "./users.repository";
-import {
-	findAllUsers,
-	findUserById,
-	insertUser,
-	updateUser,
-} from "./users.service";
+import usersService from "./users.service";
 import { CreateUser } from "./users.types";
+import { Role } from "../common/enums/user-role.enum";
 
 interface FakeUser {
 	id: number;
@@ -108,7 +104,10 @@ beforeEach(() => {
 
 describe("findUsers", () => {
 	it("Should return empty array", async () => {
-		const actualResult = await findAllUsers();
+		const actualResult = await usersService.findAllUsers({
+			active: true,
+			role: Role.ADMIN,
+		});
 
 		expect(actualResult).toEqual([]);
 	});
@@ -122,7 +121,7 @@ describe("findUserById()", () => {
 
 		const id = 1;
 		try {
-			await findUserById(id);
+			await usersService.findUserById(id);
 		} catch (error) {
 			expect(findUserByIdSpy).toBeCalledWith(id);
 			expect(error).toBeInstanceOf(createHttpError.NotFound);
@@ -134,7 +133,7 @@ describe("findUserById()", () => {
 	it("Should return target User.", async () => {
 		const id = 1;
 
-		const targetUser = await findUserById(id);
+		const targetUser = await usersService.findUserById(id);
 
 		expect(usersRepository.findUserById).toBeCalledWith(id);
 		expect(targetUser).toEqual(fakeUser);
@@ -144,7 +143,7 @@ describe("findUserById()", () => {
 describe("insertUser()", () => {
 	it("Should throw Error if User is exists.", async () => {
 		try {
-			await insertUser(fakeUser as CreateUser);
+			await usersService.insertUser(fakeUser as CreateUser, null);
 		} catch (error) {
 			expect(error).toBeInstanceOf(createHttpError.BadRequest);
 		}
@@ -153,7 +152,10 @@ describe("insertUser()", () => {
 	it("Should return created user.", async () => {
 		fakeUser.email = "gamal@gmail.com";
 
-		const createdUser = await insertUser(fakeUser as CreateUser);
+		const createdUser = await usersService.insertUser(
+			fakeUser as CreateUser,
+			null
+		);
 
 		expect(createdUser).toEqual(fakeUser);
 	});
@@ -167,7 +169,7 @@ describe("updateUser()", () => {
 		const id = 2;
 
 		try {
-			await updateUser(id, fakeData);
+			await usersService.updateUser(id, fakeData);
 		} catch (error) {
 			expect(error).toBeInstanceOf(createHttpError.NotFound);
 		}
@@ -179,7 +181,7 @@ describe("updateUser()", () => {
 		};
 		const id = 2;
 
-		const actualResult = await updateUser(id, fakeData);
+		const actualResult = await usersService.updateUser(id, fakeData);
 
 		expect(actualResult).toEqual(true);
 	});

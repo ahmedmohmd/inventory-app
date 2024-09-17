@@ -1,14 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { HttpStatusCode } from "../common/enums/http-status-code.enum";
-import {
-	createCategory,
-	deleteCategory,
-	getAllCategories,
-	getSingleCategory,
-	updateCategory,
-} from "./categories.controller";
-import * as categoriesService from "./categories.service";
+import categoriesController from "./categories.controller";
+import categoriesService from "./categories.service";
 
 vi.mock("./categories.service.ts", () => ({
 	findCategoryById: vi.fn(() => Promise.resolve({})),
@@ -40,7 +34,11 @@ describe("getSingleCategory()", () => {
 
 		const findCategoryByIdSpy = vi.spyOn(categoriesService, "findCategoryById");
 
-		await getSingleCategory(fakeRequest, fakeResponse, fakeNextFunction);
+		await categoriesController.getSingleCategory(
+			fakeRequest,
+			fakeResponse,
+			fakeNextFunction
+		);
 
 		expect(findCategoryByIdSpy).toHaveBeenCalledWith(Number(id));
 		expect(fakeResponse.status).toHaveBeenCalledWith(HttpStatusCode.OK);
@@ -55,7 +53,11 @@ describe("getAllCategories()", () => {
 			"findAllCategories"
 		);
 
-		await getAllCategories(fakeRequest, fakeResponse, fakeNextFunction);
+		await categoriesController.getAllCategories(
+			fakeRequest,
+			fakeResponse,
+			fakeNextFunction
+		);
 
 		expect(findAllCategoriesSpy).toHaveBeenCalledOnce();
 		expect(fakeResponse.status).toHaveBeenCalledWith(HttpStatusCode.OK);
@@ -72,7 +74,11 @@ describe("createCategory()", () => {
 			description: "category description",
 		};
 
-		await createCategory(fakeRequest, fakeResponse, fakeNextFunction);
+		await categoriesController.createCategory(
+			fakeRequest,
+			fakeResponse,
+			fakeNextFunction
+		);
 
 		expect(insertCategorySpy).toHaveBeenCalledWith(fakeRequest.body);
 		expect(fakeResponse.status).toHaveBeenCalledWith(HttpStatusCode.CREATED);
@@ -92,7 +98,11 @@ describe("updateCategory()", () => {
 			description: "category description",
 		};
 
-		await updateCategory(fakeRequest, fakeResponse, fakeNextFunction);
+		await categoriesController.updateCategory(
+			fakeRequest,
+			fakeResponse,
+			fakeNextFunction
+		);
 
 		expect(updateCategorySpy).toHaveBeenCalledWith(
 			Number(id),
@@ -112,7 +122,11 @@ describe("deleteCategory()", () => {
 			id,
 		};
 
-		await deleteCategory(fakeRequest, fakeResponse, fakeNextFunction);
+		await categoriesController.deleteCategory(
+			fakeRequest,
+			fakeResponse,
+			fakeNextFunction
+		);
 
 		expect(deleteCategorySpy).toHaveBeenCalledWith(Number(id));
 		expect(fakeResponse.status).toHaveBeenCalledWith(HttpStatusCode.NO_CONTENT);

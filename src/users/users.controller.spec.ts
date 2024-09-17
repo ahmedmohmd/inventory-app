@@ -1,12 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import {
-	deleteUser,
-	getAllUsers,
-	getSingleUser,
-	updateUser,
-} from "./users.controller";
-import * as usersService from "./users.service";
+import usersController from "./users.controller";
+import usersService from "./users.service";
 
 vi.mock("./users.service", () => ({
 	findAllUsers: vi.fn(() => Promise.resolve([])),
@@ -30,7 +25,11 @@ describe("getAllUsers()", () => {
 		fakeResponse.json = vi.fn();
 		fakeResponse.status = vi.fn(() => fakeResponse);
 
-		await getAllUsers(fakeRequest, fakeResponse, fakeNextFunction);
+		await usersController.getAllUsers(
+			fakeRequest,
+			fakeResponse,
+			fakeNextFunction
+		);
 
 		expect(usersService.findAllUsers).toHaveBeenCalledOnce();
 		expect(fakeResponse.json).toHaveBeenCalledOnce();
@@ -45,7 +44,11 @@ describe("getSingleUser()", () => {
 			id: "1",
 		};
 
-		await getSingleUser(fakeRequest, fakeResponse, fakeNextFunction);
+		await usersController.getSingleUser(
+			fakeRequest,
+			fakeResponse,
+			fakeNextFunction
+		);
 
 		expect(usersService.findAllUsers).toHaveBeenCalledOnce();
 		expect(fakeResponse.json).toHaveBeenCalledOnce();
@@ -65,7 +68,11 @@ describe("updateUser()", () => {
 		fakeResponse.json = vi.fn();
 		fakeResponse.status = vi.fn(() => fakeResponse);
 
-		await updateUser(fakeRequest, fakeResponse, fakeNextFunction);
+		await usersController.updateUser(
+			fakeRequest,
+			fakeResponse,
+			fakeNextFunction
+		);
 
 		expect(usersService.updateUser).toHaveBeenCalledOnce();
 		expect(fakeResponse.json).toHaveBeenCalledOnce();
@@ -80,7 +87,11 @@ describe("deleteUser()", () => {
 			id: "1",
 		};
 
-		await deleteUser(fakeRequest, fakeResponse, fakeNextFunction);
+		await usersController.deleteUser(
+			fakeRequest,
+			fakeResponse,
+			fakeNextFunction
+		);
 
 		expect(usersService.deleteUser).toHaveBeenCalledOnce();
 		expect(fakeResponse.json).toHaveBeenCalledOnce();

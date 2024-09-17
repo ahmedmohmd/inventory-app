@@ -1,3 +1,4 @@
+import { migrateDatabase } from "../db/migrate";
 import handleCompression from "./compression";
 import handleCors from "./cors";
 import handleRateLimiting from "./rate-limiting";
@@ -12,4 +13,5 @@ export default {
 	handleRateLimiting,
 	handleSecurity,
 	handleSwaggerDocs,
+	migrateDatabase,
 };

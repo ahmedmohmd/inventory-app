@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import createHttpError from "http-errors";
 import { decodeJwtToken } from "../../auth/utils/jwt.util";
 import logger from "../../logging";
-import { findUserById } from "../../users/users.service";
+import users from "../../users";
 
 /**
  * Authenticates incoming requests by verifying the presence of a valid JWT token in the Authorization header.
@@ -26,7 +26,7 @@ const authenticate: RequestHandler = async (req, res, next) => {
 	const payload = await decodeJwtToken(jwtToken);
 
 	// eslint-disable-next-line
-	const targetUser = await findUserById((payload as any).id);
+	const targetUser = await users.service.findUserById((payload as any).id);
 
 	if (!targetUser) {
 		throw new createHttpError.NotFound( // eslint-disable-next-line

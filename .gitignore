@@ -2,3 +2,7 @@
 /html
 /coverage
 /logs
+/build
+
+docker-compose.yaml
+.env

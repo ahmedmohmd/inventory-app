@@ -162,6 +162,13 @@
 			"when": 1726495340184,
 			"tag": "0022_curvy_the_call",
 			"breakpoints": true
+		},
+		{
+			"idx": 23,
+			"version": "7",
+			"when": 1726557600974,
+			"tag": "0023_lazy_doctor_octopus",
+			"breakpoints": true
 		}
 	]
 }
