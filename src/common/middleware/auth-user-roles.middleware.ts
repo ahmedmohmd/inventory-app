@@ -10,14 +10,14 @@ const authUserRoles =
 		const { user } = req as any;
 
 		if (!user) {
-			logger.errors.error(`Unauthorized Access Try.`);
+			logger.error.error(`Unauthorized Access Try.`);
 			throw new createHttpError.Unauthorized("Unauthorized User.");
 		}
 
 		const isUserAllowed = roles.includes(user?.role);
 
 		if (!isUserAllowed) {
-			logger.errors.error(`Unauthorized Access Try.`);
+			logger.error.error(`Unauthorized Access Try.`);
 			throw new createHttpError.Forbidden("Forbidden Resource.");
 		}
 

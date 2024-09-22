@@ -5,7 +5,7 @@ import logger from "../logging";
 
 // eslint-disable-next-line
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
-	logger.errors.error(err.stack);
+	logger.error.error(err.stack);
 
 	if (createHttpError.isHttpError(err)) {
 		return res.status(err.statusCode).json({

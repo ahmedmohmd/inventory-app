@@ -13,7 +13,7 @@ const findCategoryById = async (id: number) => {
 	const category = await categoriesRepository.findCategoryById(id);
 
 	if (!category) {
-		logger.errors.error(`Category with ID: ${id} not found.`);
+		logger.error.error(`Category with ID: ${id} not found.`);
 		throw new createHttpError.NotFound(`Category with ID: ${id} not found )`);
 	}
 
@@ -39,7 +39,7 @@ const insertCategory = async (data: CreateCategory) => {
 	const category = await categoriesRepository.findCategoryByName(data.name);
 
 	if (category) {
-		logger.errors.error(`Category with ID: ${category.id} already Exists.`);
+		logger.error.error(`Category with ID: ${category.id} already Exists.`);
 
 		throw new createHttpError.BadRequest(
 			`Category ${data.name} is already Exists.`
@@ -60,7 +60,7 @@ const updateCategory = async (id: number, data: UpdateCategory) => {
 	const category = await categoriesRepository.findCategoryById(id);
 
 	if (!category) {
-		logger.errors.error(`Category with ID: ${id} not found.`);
+		logger.error.error(`Category with ID: ${id} not found.`);
 		throw new createHttpError.NotFound(`Category with ID: ${id} not found.`);
 	}
 
@@ -77,7 +77,7 @@ const deleteCategory = async (id: number) => {
 	const category = await categoriesRepository.findCategoryById(id);
 
 	if (!category) {
-		logger.errors.error(`Category with ID: ${id} not found.`);
+		logger.error.error(`Category with ID: ${id} not found.`);
 		throw new createHttpError.NotFound(`Category with ID: ${id} not found )`);
 	}
 

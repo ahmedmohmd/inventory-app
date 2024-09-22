@@ -17,7 +17,7 @@ const authenticate: RequestHandler = async (req, res, next) => {
 	const authorizationHeader = req.headers?.authorization;
 
 	if (!authorizationHeader) {
-		logger.errors.error(`Failed authentication try.`);
+		logger.error.error(`Failed authentication try.`);
 
 		throw new createHttpError.Unauthorized(`Your are not Authorized.`);
 	}

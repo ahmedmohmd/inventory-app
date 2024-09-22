@@ -23,7 +23,7 @@ const findUserById = async (id: number) => {
 	);
 
 	if (!user) {
-		logger.errors.error(`User with Id: ${id} not Found Exception.`);
+		logger.error.error(`User with Id: ${id} not Found Exception.`);
 		throw new createHttpError.NotFound(`User with Id: ${id} not Found.`);
 	}
 
@@ -89,7 +89,7 @@ const insertUser = async (
 	const user = await usersRepository.findUserByEmail(userData.email);
 
 	if (user) {
-		logger.errors.error(`User with Id: ${user.id} already exists Exception.`);
+		logger.error.error(`User with Id: ${user.id} already exists Exception.`);
 		throw new createHttpError.BadRequest(
 			`User with Id: ${user.id} is already exists Found.`
 		);
@@ -136,7 +136,7 @@ const updateUser = async (
 	const user = await usersRepository.findUserById(id);
 
 	if (!user) {
-		logger.errors.error(`User with Id: ${id} not Found Exception.`);
+		logger.error.error(`User with Id: ${id} not Found Exception.`);
 
 		throw new createHttpError.NotFound(`User with Id: ${id} not Found.`);
 	}
@@ -189,7 +189,7 @@ const deleteUser = async (id: number) => {
 	const user = await usersRepository.findUserById(id);
 
 	if (!user) {
-		logger.errors.error(`User with Id: ${id} not Found.`);
+		logger.error.error(`User with Id: ${id} not Found.`);
 
 		throw new createHttpError.NotFound(`User with Id: ${id} not Found.`);
 	}

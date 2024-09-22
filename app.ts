@@ -25,10 +25,10 @@ const port = Number(ENV.PORT) || config.defaults.port;
 
 async function main() {
 	await connectToDatabase();
-	logger.general.info(`connected to database successfully.`);
+	logger.info.info(`connected to database successfully.`);
 
 	app.listen(port, () => {
-		logger.general.info(`listening on ${config.apiEndPoint}.`);
+		logger.info.info(`listening on ${config.apiEndPoint}.`);
 	});
 }
 main();

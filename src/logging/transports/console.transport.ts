@@ -1,12 +1,43 @@
 import { format, transports } from "winston";
-const { combine, timestamp, printf } = format;
+import chalk from "chalk";
 
-const customFormat = printf(
-	({ level, message, timestamp }) => `${timestamp} [${level}]: ${message}`
-);
+const { combine, timestamp, printf, errors, splat } = format;
+
+const levels = {
+	error: "red",
+	warn: "yellow",
+	info: "green",
+	http: "magenta",
+	verbose: "cyan",
+	debug: "blue",
+	silly: "gray",
+};
+
+const customFormat = printf(({ level, message, timestamp, ...metadata }) => {
+	const levelUpper = level.toUpperCase();
+	const coloredLevel = chalk[levels[level]](levelUpper.padEnd(7));
+
+	let msg = `${chalk.gray(timestamp)} ${coloredLevel}: ${message}`;
+
+	if (metadata.stack) {
+		msg += `\n${chalk.red(metadata.stack)}`;
+	}
+
+	if (Object.keys(metadata).length > 0 && !metadata.stack) {
+		msg += `\n${chalk.cyan("metadata:")} ${JSON.stringify(metadata, null, 2)}`;
+	}
+
+	return msg;
+});
 
 const consoleTransport = new transports.Console({
-	format: combine(timestamp(), customFormat),
+	format: combine(
+		timestamp({ format: "YYYY-MM-DD HH:mm:ss.SSS" }),
+		errors({ stack: true }),
+		splat(),
+		customFormat
+	),
+	level: "debug",
 });
 
 export { consoleTransport };

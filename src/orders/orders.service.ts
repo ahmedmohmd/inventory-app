@@ -52,7 +52,7 @@ const findOrderById = async (id: number) => {
 	const order = await ordersRepository.findOrderById(id);
 
 	if (!order) {
-		logger.errors.error(`Order with ID: ${id} not found.`);
+		logger.error.error(`Order with ID: ${id} not found.`);
 
 		throw new createHttpError.NotFound(`Order with ID: ${id} not found.`);
 	}
@@ -128,13 +128,13 @@ const insertOrder = async (data: CreateOrder) => {
 const changeOrderState = async (orderId: number, status: OrderStatus) => {
 	const order = await ordersRepository.findOrderById(orderId);
 	if (!order) {
-		logger.errors.error(`Order with ID: ${orderId} not found.`);
+		logger.error.error(`Order with ID: ${orderId} not found.`);
 
 		throw new createHttpError.NotFound(`Order with ID: ${orderId} not found.`);
 	}
 
 	if (order.status === OrderStatus.COMPLETED) {
-		logger.errors.error(`You can't change the status of a completed order.`);
+		logger.error.error(`You can't change the status of a completed order.`);
 
 		throw new createHttpError.BadRequest(
 			"You can't change the status of a completed order."
@@ -152,7 +152,7 @@ const changeOrderState = async (orderId: number, status: OrderStatus) => {
 		const product = products.find((product) => product.id === item.productId);
 
 		if (!product) {
-			logger.errors.error(`Product with ID: ${item.productId}.`);
+			logger.error.error(`Product with ID: ${item.productId}.`);
 
 			throw new createHttpError.BadRequest("Product not found");
 		}
@@ -163,7 +163,7 @@ const changeOrderState = async (orderId: number, status: OrderStatus) => {
 		);
 
 		if (!productStock) {
-			logger.errors.error(
+			logger.error.error(
 				`Stock with Product ID: ${product.id} and Warehouse ID: ${order.warehouseId} not Found.`
 			);
 
@@ -206,7 +206,7 @@ const deleteOrder = async (id: number) => {
 	const order = await ordersRepository.findOrderById(id);
 
 	if (!order) {
-		logger.errors.error(`Order with ID: ${id} not found.`);
+		logger.error.error(`Order with ID: ${id} not found.`);
 
 		throw new createHttpError.NotFound(`Order with ID: ${id} not found.`);
 	}

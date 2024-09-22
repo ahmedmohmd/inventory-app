@@ -32,7 +32,7 @@ const findWarehouseById = async (id: number) => {
 	const warehouse = await handleCache(`warehouse:${id}`, fetchWarehouse);
 
 	if (!warehouse) {
-		logger.errors.error(`Warehouse with ID: ${id} not Found.`);
+		logger.error.error(`Warehouse with ID: ${id} not Found.`);
 
 		throw new createHttpError.NotFound(`Warehouse with ID: ${id} not Found.`);
 	}
@@ -50,7 +50,7 @@ const insertWarehouse = async (data: CreateWarehouse) => {
 	const warehouse = await warehousesRespository.findWarehouseByName(data.name);
 
 	if (warehouse) {
-		logger.errors.error(`Warehouse with Name: ${data.name} already Exists.`);
+		logger.error.error(`Warehouse with Name: ${data.name} already Exists.`);
 
 		throw new createHttpError.BadRequest(
 			` Warehouse with Name: ${data.name} already Exists.`
@@ -78,7 +78,7 @@ const updateWarehouse = async (id: number, data: UpdateWarehouse) => {
 	const warehouse = await warehousesRespository.findWarehouseById(id);
 
 	if (!warehouse) {
-		logger.errors.error(`Warehouse with ID: ${id} not Found.`);
+		logger.error.error(`Warehouse with ID: ${id} not Found.`);
 
 		throw new createHttpError.NotFound(`Warehouse with ID: ${id} not Found.`);
 	}
@@ -101,7 +101,7 @@ const deleteWarehouse = async (id: number) => {
 	const warehouse = await warehousesRespository.findWarehouseById(id);
 
 	if (!warehouse) {
-		logger.errors.error(`Warehouse with ID: ${id} not Found.`);
+		logger.error.error(`Warehouse with ID: ${id} not Found.`);
 
 		throw new createHttpError.NotFound(`Warehouse with ID: ${id} not Found.`);
 	}

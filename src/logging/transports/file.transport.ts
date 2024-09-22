@@ -2,6 +2,7 @@ import path from "path";
 import { format, transports } from "winston";
 import "winston-daily-rotate-file";
 import { LogLevel } from "../enums/log-level.enum";
+import { Format } from "logform";
 
 const { combine, timestamp, json } = format;
 
@@ -16,7 +17,11 @@ const createLoggingPath = (fileName: string) =>
 		`${fileName}-%DATE%.log`
 	);
 
-const createFileTransport = (fileName: string, level: LogLevel | null = null) =>
+const createFileTransport = (
+	fileName: string,
+	level: LogLevel | null = null,
+	format: Format = combine(timestamp(), json())
+) =>
 	new transports.DailyRotateFile({
 		filename: createLoggingPath(fileName),
 		datePattern: "YYYY-MM-DD",
@@ -24,7 +29,7 @@ const createFileTransport = (fileName: string, level: LogLevel | null = null) =>
 		zippedArchive: true,
 		maxSize: "20m",
 		maxFiles: "14d",
-		format: combine(timestamp(), json()),
+		format: format,
 	});
 
 export { createFileTransport };

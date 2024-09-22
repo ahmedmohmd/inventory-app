@@ -41,7 +41,7 @@ const findProductById = async (id: number) => {
 	const product = await productsRepository.findProductById(id);
 
 	if (!product) {
-		logger.errors.error(`Product with ID: ${id} not found.`);
+		logger.error.error(`Product with ID: ${id} not found.`);
 
 		throw new createHttpError.NotFound(`Product with ID: ${id} not found.`);
 	}
@@ -65,7 +65,7 @@ const insertProduct = async (
 	);
 
 	if (!category) {
-		logger.errors.error(
+		logger.error.error(
 			`Category with ID: ${productData.categoryId} not found.`
 		);
 
@@ -78,7 +78,7 @@ const insertProduct = async (
 		productData.supplierId
 	);
 	if (!supplier) {
-		logger.errors.error(
+		logger.error.error(
 			`Supplier with ID: ${productData.supplierId} not found.`
 		);
 
@@ -89,7 +89,7 @@ const insertProduct = async (
 
 	const section = await sections.service.findSectionById(productData.sectionId);
 	if (!section) {
-		logger.errors.error(`Section with ID: ${productData.sectionId} not found.`);
+		logger.error.error(`Section with ID: ${productData.sectionId} not found.`);
 
 		throw new createHttpError.BadRequest(
 			`Section with ID: ${productData.sectionId} not found.`
@@ -97,7 +97,7 @@ const insertProduct = async (
 	}
 
 	if (images.length > MAX_IMAGES) {
-		logger.errors.error(`You can only upload up to 4 images.`);
+		logger.error.error(`You can only upload up to 4 images.`);
 
 		throw new createHttpError.BadRequest("You can only upload up to 4 images.");
 	}
@@ -130,7 +130,7 @@ const updateProduct = async (id: number, productData: UpdateProduct) => {
 	const product = await productsRepository.findProductById(id);
 
 	if (!product) {
-		logger.errors.error(`Product with ID: ${id} not found.`);
+		logger.error.error(`Product with ID: ${id} not found.`);
 
 		throw new createHttpError.NotFound(`Product with ID: ${id} not found.`);
 	}
@@ -148,7 +148,7 @@ const deleteProduct = async (id: number) => {
 	const product = await productsRepository.findProductById(id);
 
 	if (!product) {
-		logger.errors.error(`Product with ID: ${id} not found.`);
+		logger.error.error(`Product with ID: ${id} not found.`);
 
 		throw new createHttpError.NotFound(`Product with ID: ${id} not found.`);
 	}

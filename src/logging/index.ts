@@ -1,4 +1,4 @@
-import { errorsLogger } from "./loggers/errors.logger";
-import { generalLogger as general } from "./loggers/general.logger";
+import { errorsLogger } from "./loggers/error.logger";
+import { infoLogger } from "./loggers/info.logger";
 
-export default { general, errors: errorsLogger };
+export default { info: infoLogger, error: errorsLogger };

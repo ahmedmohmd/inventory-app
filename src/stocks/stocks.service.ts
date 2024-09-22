@@ -24,7 +24,7 @@ const findStockById = async (id: number) => {
 	const stock = await stocksRepository.findStockById(id);
 
 	if (!stock) {
-		logger.errors.error(`Stock with ID: ${id} not Found.`);
+		logger.error.error(`Stock with ID: ${id} not Found.`);
 
 		throw new createHttpError.NotFound(`Stock with ID: ${id} not Found.`);
 	}
@@ -41,7 +41,7 @@ const findStockById = async (id: number) => {
 const insertStock = async (data: CreateStock) => {
 	const product = await products.service.findProductById(data.productId);
 	if (!product) {
-		logger.errors.error(`Product with ID: ${data.productId} Not Found.`);
+		logger.error.error(`Product with ID: ${data.productId} Not Found.`);
 
 		throw new createHttpError.BadRequest(
 			`Product with ID: ${data.productId} Not Found.`
@@ -52,7 +52,7 @@ const insertStock = async (data: CreateStock) => {
 		data.warehouseId
 	);
 	if (!warehouse) {
-		logger.errors.error(`Warehouse with ID: ${data.warehouseId} Not Found.`);
+		logger.error.error(`Warehouse with ID: ${data.warehouseId} Not Found.`);
 
 		throw new createHttpError.BadRequest(
 			`Warehouse with ID: ${data.warehouseId} Not Found.`
@@ -64,7 +64,7 @@ const insertStock = async (data: CreateStock) => {
 		data.warehouseId
 	);
 	if (stock) {
-		logger.errors.error(
+		logger.error.error(
 			`Stock with Product ID: ${data.productId} and Warehouse ID: ${data.warehouseId} already Exists.`
 		);
 
@@ -87,7 +87,7 @@ const updateStock = async (id: number, data: UpdateStock) => {
 	const stock = await stocksRepository.findStockById(id);
 
 	if (!stock) {
-		logger.errors.error(`Stock with ID: ${id} not Found.`);
+		logger.error.error(`Stock with ID: ${id} not Found.`);
 
 		throw new createHttpError.NotFound(`Stock with ID: ${id} not Found.`);
 	}
@@ -117,7 +117,7 @@ const deleteStock = async (id: number) => {
 	const stock = await stocksRepository.findStockById(id);
 
 	if (!stock) {
-		logger.errors.error(`Stock with ID: ${id} not Found.`);
+		logger.error.error(`Stock with ID: ${id} not Found.`);
 
 		throw new createHttpError.NotFound(`Stock with ID: ${id} not Found.`);
 	}

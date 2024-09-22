@@ -22,14 +22,14 @@ const login = async (email: string, password: string) => {
 	const targetUser = await users.service.findUserByEmail(email);
 
 	if (!targetUser) {
-		logger.errors.error(`User with Email: ${email} not Found.`);
+		logger.error.error(`User with Email: ${email} not Found.`);
 		throw new createHttpError.NotFound(`User with Email: ${email} not Found.`);
 	}
 
 	const isMatch = await checkPassword(password, targetUser.password);
 
 	if (!isMatch) {
-		logger.errors.error(`Wrong Password for User: ${email}.`);
+		logger.error.error(`Wrong Password for User: ${email}.`);
 
 		await mail.service.sendMail({
 			from: ENV.SENDER_EMAIL,
@@ -90,7 +90,7 @@ const resetPasswordRequest = async (email: string) => {
 	const targetUser = await users.service.findUserByEmail(email);
 
 	if (!targetUser) {
-		logger.errors.error(`User with Email: ${email} not Found.`);
+		logger.error.error(`User with Email: ${email} not Found.`);
 		throw new createHttpError.NotFound(`User with Email: ${email} not Found.`);
 	}
 
@@ -131,7 +131,7 @@ const validateResetToken = async (resetToken: string) => {
 	const targetUser = await users.service.findUserByResetToken(resetToken);
 
 	if (!targetUser) {
-		logger.errors.error(`User with Reset Token: ${resetToken} not Found.`);
+		logger.error.error(`User with Reset Token: ${resetToken} not Found.`);
 		throw new createHttpError.NotFound(
 			`User with Reset Token: ${resetToken} not Found.`
 		);
@@ -140,7 +140,7 @@ const validateResetToken = async (resetToken: string) => {
 	try {
 		await decodeJwtToken(resetToken);
 	} catch (error) {
-		logger.errors.error(`Invalid Reset Token: ${error}.`);
+		logger.error.error(`Invalid Reset Token: ${error}.`);
 		throw new createHttpError.Unauthorized(`Invalid Reset Token.`);
 	}
 
@@ -164,7 +164,7 @@ const resetPassword = async (resetToken: string, password: string) => {
 	const targetUser = await users.service.findUserById(id);
 
 	if (!targetUser) {
-		logger.errors.error(`User with Id: ${id} not Found.`);
+		logger.error.error(`User with Id: ${id} not Found.`);
 		throw new createHttpError.NotFound(`User with Id: ${id} not Found.`);
 	}
 

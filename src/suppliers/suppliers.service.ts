@@ -44,7 +44,7 @@ const findSupplierById = async (id: number) => {
 	const supplier = await suppliersRepository.findSupplierById(id);
 
 	if (!supplier) {
-		logger.errors.error(`Supplier with Id: ${id} not Found.`);
+		logger.error.error(`Supplier with Id: ${id} not Found.`);
 
 		throw new createHttpError.NotFound(`Supplier with Id: ${id} not Found.`);
 	}
@@ -62,7 +62,7 @@ const insertSupplier = async (data: CreateSupplier) => {
 	const supplier = await suppliersRepository.findSupplierByEmail(data.email);
 
 	if (supplier) {
-		logger.errors.error(`Supplier with Email: ${data.email} already Exists.`);
+		logger.error.error(`Supplier with Email: ${data.email} already Exists.`);
 
 		throw new createHttpError.BadRequest(
 			` Supplier with Email: ${data.email} already Exists.`
@@ -83,7 +83,7 @@ const updateSupplier = async (id: number, data: CreateSupplier) => {
 	const supplier = await suppliersRepository.findSupplierById(id);
 
 	if (!supplier) {
-		logger.errors.error(`Supplier with Id: ${id} not Found.`);
+		logger.error.error(`Supplier with Id: ${id} not Found.`);
 
 		throw new createHttpError.NotFound(`Supplier with Id: ${id} not Found.`);
 	}
@@ -101,7 +101,7 @@ const deleteSupplier = async (id: number) => {
 	const supplier = await suppliersRepository.findSupplierById(id);
 
 	if (!supplier) {
-		logger.errors.error(`Supplier with Id: ${id} not Found.`);
+		logger.error.error(`Supplier with Id: ${id} not Found.`);
 
 		throw new createHttpError.NotFound(`Supplier with Id: ${id} not Found.`);
 	}
