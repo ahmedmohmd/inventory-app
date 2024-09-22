@@ -120,6 +120,14 @@ const insertUser = async (
 	return createdUser;
 };
 
+/**
+ * Updates a user in the database with the provided data.
+ *
+ * @param {number} id - The unique identifier of the user to update.
+ * @param {UpdateUser} userData - The updated data for the user.
+ * @param {Express.Multer.File} [profileImage] - The updated profile image of the user.
+ * @return {Promise<User>} The updated user object.
+ */
 const updateUser = async (
 	id: number,
 	userData: UpdateUser,
@@ -156,6 +164,12 @@ const updateUser = async (
 	return updatedUser;
 };
 
+/**
+ * Retrieves a user from the database by their reset password token.
+ *
+ * @param {string} resetToken - The reset password token of the user.
+ * @return {Promise<User | null>} A Promise that resolves to the user with the given reset password token, or null if not found.
+ */
 const findUserByResetToken = async (resetToken: string) => {
 	const user = await handleCache(
 		`user:${resetToken}`,
@@ -165,6 +179,12 @@ const findUserByResetToken = async (resetToken: string) => {
 	return user;
 };
 
+/**
+ * Deletes a user from the database by their unique identifier.
+ *
+ * @param {number} id - The unique identifier of the user to delete.
+ * @return {Promise<object>} The result of the deletion operation.
+ */
 const deleteUser = async (id: number) => {
 	const user = await usersRepository.findUserById(id);
 
