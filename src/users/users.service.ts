@@ -5,6 +5,10 @@ import logger from "../logging";
 import usersRepository from "./users.repository";
 import { CreateUser, FindAllUsersQuery, UpdateUser } from "./users.types";
 import { Role } from "../common/enums/user-role.enum";
+import handleCache from "../common/utils/handle-cache.util";
+import mail from "../mail";
+import { ENV } from "../../config/env";
+import cache from "../cache";
 
 /**
  * Retrieves a user by their unique identifier.
@@ -13,7 +17,10 @@ import { Role } from "../common/enums/user-role.enum";
  * @return {object} The user object associated with the provided ID.
  */
 const findUserById = async (id: number) => {
-	const user = await usersRepository.findUserById(id);
+	const user = await handleCache(
+		`user:${id}`,
+		async () => await usersRepository.findUserById(id)
+	);
 
 	if (!user) {
 		logger.errors.error(`User with Id: ${id} not Found Exception.`);
@@ -30,7 +37,12 @@ const findUserById = async (id: number) => {
  * @return {Promise<User>} The user object if found, or undefined if not found.
  */
 const findUserByEmail = async (email: string) => {
-	return await usersRepository.findUserByEmail(email);
+	const user = await handleCache(
+		`user:${email}`,
+		async () => await usersRepository.findUserByEmail(email)
+	);
+
+	return user;
 };
 
 /**
@@ -40,7 +52,12 @@ const findUserByEmail = async (email: string) => {
  * @return {Promise<User[]>} A Promise that resolves to an array of user objects.
  */
 const findAllUsers = async (query: FindAllUsersQuery) => {
-	return await usersRepository.findAllUsers(query);
+	const users = await handleCache(
+		`users:${JSON.stringify(query)}`,
+		async () => await usersRepository.findAllUsers(query)
+	);
+
+	return users;
 };
 
 /**
@@ -50,7 +67,12 @@ const findAllUsers = async (query: FindAllUsersQuery) => {
  * @return {Promise<User[]>} A Promise that resolves to an array of user objects.
  */
 const findUsersByRole = async (role: Role) => {
-	return await usersRepository.findUsersByRole(role);
+	const user = await handleCache(
+		`users:${role}`,
+		async () => await usersRepository.findUsersByRole(role)
+	);
+
+	return user;
 };
 
 /**
@@ -83,6 +105,18 @@ const insertUser = async (
 
 	const createdUser = await usersRepository.insertUser(userData);
 
+	await mail.service.sendMail({
+		from: ENV.SENDER_EMAIL,
+		to: createdUser.email,
+		subject: "Account Created.",
+		text: `Hello, Your account has been created.`,
+	});
+
+	await cache.service.addToCache(
+		`user:${createdUser.id}`,
+		JSON.stringify(createdUser)
+	);
+
 	return createdUser;
 };
 
@@ -114,13 +148,21 @@ const updateUser = async (
 		password: await hashPassword(userData.password as string),
 	});
 
-	await usersRepository.updateUser(id, userData);
+	const updatedUser = await usersRepository.updateUser(id, userData);
 
-	return;
+	await cache.service.removeFromCache(`user:${id}`);
+	await cache.service.addToCache(`user:${id}`, JSON.stringify(updatedUser));
+
+	return updatedUser;
 };
 
 const findUserByResetToken = async (resetToken: string) => {
-	return await usersRepository.findUserByResetToken(resetToken);
+	const user = await handleCache(
+		`user:${resetToken}`,
+		async () => await usersRepository.findUserByResetToken(resetToken)
+	);
+
+	return user;
 };
 
 const deleteUser = async (id: number) => {
@@ -133,9 +175,11 @@ const deleteUser = async (id: number) => {
 	}
 
 	await removeImage(user.profileImagePublicId);
-	await usersRepository.deleteUser(id);
+	const result = await usersRepository.deleteUser(id);
 
-	return;
+	await cache.service.removeFromCache(`user:${id}`);
+
+	return result;
 };
 
 export default {

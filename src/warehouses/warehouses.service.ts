@@ -2,6 +2,8 @@ import createHttpError from "http-errors";
 import logger from "../logging";
 import warehousesRespository from "./warehouses.respository";
 import { CreateWarehouse, UpdateWarehouse } from "./warehouses.types";
+import handleCache from "../common/utils/handle-cache.util";
+import cache from "../cache";
 
 /**
  * Retrieves a list of all warehouses.
@@ -9,7 +11,12 @@ import { CreateWarehouse, UpdateWarehouse } from "./warehouses.types";
  * @return {Array} A list of warehouses
  */
 const findAllWarehouses = async () => {
-	return await warehousesRespository.findAllWarehouses();
+	const warehouses = await handleCache(
+		"warehouses",
+		warehousesRespository.findAllWarehouses
+	);
+
+	return warehouses;
 };
 
 /**
@@ -19,7 +26,10 @@ const findAllWarehouses = async () => {
  * @return {object} The warehouse object with the matching ID
  */
 const findWarehouseById = async (id: number) => {
-	const warehouse = await warehousesRespository.findWarehouseById(id);
+	const fetchWarehouse = async () =>
+		await warehousesRespository.findWarehouseById(id);
+
+	const warehouse = await handleCache(`warehouse:${id}`, fetchWarehouse);
 
 	if (!warehouse) {
 		logger.errors.error(`Warehouse with ID: ${id} not Found.`);
@@ -47,7 +57,14 @@ const insertWarehouse = async (data: CreateWarehouse) => {
 		);
 	}
 
-	return await warehousesRespository.insertWarehouse(data);
+	const result = await warehousesRespository.insertWarehouse(data)[0];
+
+	await cache.service.addToCache(
+		`warehouse:${result.id}`,
+		JSON.stringify(result)
+	);
+
+	return result;
 };
 
 /**
@@ -66,7 +83,12 @@ const updateWarehouse = async (id: number, data: UpdateWarehouse) => {
 		throw new createHttpError.NotFound(`Warehouse with ID: ${id} not Found.`);
 	}
 
-	return await warehousesRespository.updateWarehouse(id, data);
+	const result = await warehousesRespository.updateWarehouse(id, data);
+
+	await cache.service.removeFromCache(`warehouse:${id}`);
+	await cache.service.addToCache(`warehouse:${id}`, JSON.stringify(result));
+
+	return result;
 };
 
 /**
@@ -84,7 +106,11 @@ const deleteWarehouse = async (id: number) => {
 		throw new createHttpError.NotFound(`Warehouse with ID: ${id} not Found.`);
 	}
 
-	return await warehousesRespository.deleteWarehouse(id);
+	const result = await warehousesRespository.deleteWarehouse(id);
+
+	await cache.service.removeFromCache(`warehouse:${id}`);
+
+	return result;
 };
 
 export default {
