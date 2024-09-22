@@ -13,9 +13,12 @@ const levels = {
 	silly: "gray",
 };
 
+const PAD_END = 7;
+const IDENTATION_LEVEL = 2;
+
 const customFormat = printf(({ level, message, timestamp, ...metadata }) => {
 	const levelUpper = level.toUpperCase();
-	const coloredLevel = chalk[levels[level]](levelUpper.padEnd(7));
+	const coloredLevel = chalk[levels[level]](levelUpper.padEnd(PAD_END));
 
 	let msg = `${chalk.gray(timestamp)} ${coloredLevel}: ${message}`;
 
@@ -24,7 +27,7 @@ const customFormat = printf(({ level, message, timestamp, ...metadata }) => {
 	}
 
 	if (Object.keys(metadata).length > 0 && !metadata.stack) {
-		msg += `\n${chalk.cyan("metadata:")} ${JSON.stringify(metadata, null, 2)}`;
+		msg += `\n${chalk.cyan("metadata:")} ${JSON.stringify(metadata, null, IDENTATION_LEVEL)}`;
 	}
 
 	return msg;
