@@ -5,7 +5,6 @@ import { ENV } from "./config/env";
 import bootstrap from "./src/bootstrap";
 import { connectToDatabase } from "./src/db";
 import logger from "./src/logging";
-// import { findAllUsers, insertUser } from "./src/users/users.service";
 
 export const app = express();
 app.use(express.json());

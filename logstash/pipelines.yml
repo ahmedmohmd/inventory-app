@@ -1,0 +1,5 @@
+- pipeline.id: info_logs
+  path.config: "/usr/share/logstash/pipelines/info.conf"
+
+- pipeline.id: error_logs
+  path.config: "/usr/share/logstash/pipelines/error.conf"
