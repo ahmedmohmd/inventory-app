@@ -3,6 +3,7 @@ import suppliersRepository from "./suppliers.repository";
 import { CreateSupplier, FindAllSuppliersQuery } from "./suppliers.types";
 import { config } from "../../config/config";
 import logger from "../logging";
+import { updateProductsByRelatedEntity } from "../common/utils/updateproducts-by-related-entity.util";
 
 /**
  * Retrieves a list of all suppliers with pagination.
@@ -88,7 +89,11 @@ const updateSupplier = async (id: number, data: CreateSupplier) => {
 		throw new createHttpError.NotFound(`Supplier with Id: ${id} not Found.`);
 	}
 
-	return await suppliersRepository.updateSupplier(id, data);
+	const [updatedSupplier] = await suppliersRepository.updateSupplier(id, data);
+
+	await updateProductsByRelatedEntity("supplier", id, updatedSupplier);
+
+	return updatedSupplier;
 };
 
 /**

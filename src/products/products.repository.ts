@@ -96,26 +96,11 @@ const findProductById = async (id: number) => {
 		where: eq(products.id, id),
 
 		with: {
-			category: {
-				columns: {
-					name: true,
-				},
-			},
-			section: {
-				columns: {
-					name: true,
-				},
-			},
-			supplier: {
-				columns: {
-					name: true,
-				},
-			},
-			screenshots: {
-				columns: {
-					url: true,
-				},
-			},
+			category: true,
+			section: true,
+			supplier: true,
+			screenshots: true,
+			stocks: true,
 		},
 	});
 
@@ -129,12 +114,24 @@ const findProductById = async (id: number) => {
  * @return {unknown} The created product data.
  */
 const insertProduct = async (productData: CreateProduct) => {
-	const createdProduct = await db
+	const [createdProduct] = await db
 		.insert(products)
 		.values(productData)
 		.returning();
 
-	return createdProduct[0];
+	const product = await db.query.products.findFirst({
+		where: eq(products.id, createdProduct.id),
+
+		with: {
+			category: true,
+			section: true,
+			supplier: true,
+			screenshots: true,
+			stocks: true,
+		},
+	});
+
+	return product;
 };
 
 /**
@@ -145,21 +142,28 @@ const insertProduct = async (productData: CreateProduct) => {
  * @return {unknown} The updated product data.
  */
 const updateProduct = async (id: number, productData: UpdateProduct) => {
-	return await db
+	const [updatedProduct] = await db
 		.update(products)
 		.set(productData)
 		.where(eq(products.id, id))
 		.returning();
+
+	return updatedProduct;
 };
 
 /**
  * Deletes a product from the database by its ID.
  *
  * @param {number} id - The ID of the product to be deleted.
- * @return {unknown} The result of the deletion operation.
+ * @return {unknown} The deleted product data.
  */
 const deleteProduct = async (id: number) => {
-	return await db.delete(products).where(eq(products.id, id)).execute();
+	const [deletedProduct] = await db
+		.delete(products)
+		.where(eq(products.id, id))
+		.returning();
+
+	return deletedProduct;
 };
 
 export default {

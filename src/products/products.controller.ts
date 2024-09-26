@@ -78,10 +78,22 @@ const deleteProduct: RequestHandler = async (req, res) => {
 	return res.status(StatusCodes.NO_CONTENT).send();
 };
 
+const searchProducts: RequestHandler = async ({ query }, res) => {
+	if (!query?.search) {
+		return res.status(StatusCodes.OK).json([]);
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const products = await productsService.searchProducts(query as any);
+
+	return res.status(StatusCodes.OK).json(products);
+};
+
 export default {
 	getAllProducts,
 	getSingleProduct,
 	createProduct,
 	updateProduct,
 	deleteProduct,
+	searchProducts,
 };

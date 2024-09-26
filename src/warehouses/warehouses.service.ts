@@ -57,7 +57,15 @@ const insertWarehouse = async (data: CreateWarehouse) => {
 		);
 	}
 
-	const result = await warehousesRespository.insertWarehouse(data)[0];
+	const result = await warehousesRespository.insertWarehouse(data);
+
+	if (!result) {
+		logger.error.error(`Warehouse with Name: ${data.name} not Inserted.`);
+
+		throw new createHttpError.InternalServerError(
+			`Warehouse with Name: ${data.name} not Inserted.`
+		);
+	}
 
 	await cache.service.addToCache(
 		`warehouse:${result.id}`,

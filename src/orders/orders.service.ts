@@ -11,6 +11,7 @@ import mail from "../mail";
 import users from "../users";
 import { Role } from "../common/enums/user-role.enum";
 import { ENV } from "../../config/env";
+import elasticSearch from "../elastic-search";
 
 /**
  * Retrieves a list of orders based on the provided query parameters.
@@ -19,27 +20,95 @@ import { ENV } from "../../config/env";
  * @return {object} An object containing pagination metadata and an array of orders.
  */
 const findAllOrders = async (query: FindAllOrdersQuery) => {
-	const orders = await ordersRepository.findAllOrders(query);
-
 	const currentPage = Number(query.page) || config.pagination.page;
 	const pageSize = Number(query.limit) || config.pagination.limit;
-	const totalCount = await ordersRepository.countAllOrders(query);
+
+	const elasticQueryOptions: { bool: { must: Record<string, unknown>[] } } = {
+		bool: {
+			must: [],
+		},
+	};
+
+	if (query.status) {
+		elasticQueryOptions.bool.must.push({
+			term: {
+				status: query.status,
+			},
+		});
+	}
+
+	if (query.warehouseId) {
+		elasticQueryOptions.bool.must.push({
+			term: {
+				warehouseId: Number(query.supplierId),
+			},
+		});
+	}
+
+	if (query.supplierId) {
+		elasticQueryOptions.bool.must.push({
+			term: {
+				supplierId: Number(query.supplierId),
+			},
+		});
+	}
+
+	const sortOptions: Record<string, { order: "asc" | "desc" }>[] = [];
+
+	if (query.sortBy) {
+		const sortOrder = query.orderBy === "desc" ? "desc" : "asc";
+
+		if (typeof query.sortBy === "string") {
+			sortOptions.push({
+				[`${query.sortBy}.keyword`]: { order: sortOrder },
+			});
+		} else {
+			sortOptions.push({
+				[query.sortBy]: { order: sortOrder },
+			});
+		}
+	} else {
+		sortOptions.push({
+			createdAt: { order: "asc" },
+		});
+	}
+
+	const options: Record<string, object | string | number> = {
+		index: "orders",
+		from: (currentPage - 1) * pageSize,
+		size: pageSize,
+		sort: sortOptions,
+	};
+
+	if (elasticQueryOptions.bool.must.length > 0) {
+		options.query = elasticQueryOptions;
+	} else {
+		options.query = {
+			match_all: {},
+		};
+	}
+
+	const result = await elasticSearch.client.search(options);
+
+	const final: Record<string, object | string | number> = {};
+
+	const totalCount = result.hits.total
+		? (result.hits.total as { value: number }).value
+		: 0;
 	const totalPages = Math.ceil(totalCount / pageSize);
 	const nextPage = currentPage < totalPages ? currentPage + 1 : null;
 	const prevPage = currentPage > 1 ? currentPage - 1 : null;
 
-	return {
-		pagination: {
-			page_size: pageSize,
-			total_count: totalCount,
-			total_pages: totalPages,
-			current_page: currentPage,
-			next_page: nextPage,
-			prev_page: prevPage,
-		},
-
-		data: orders,
+	final.data = result.hits ? result?.hits?.hits : [];
+	final.pagination = {
+		total_count: totalCount,
+		total_pages: totalPages,
+		current_page: currentPage,
+		next_page: nextPage,
+		prev_page: prevPage,
 	};
+
+	return final;
 };
 
 /**
@@ -106,14 +175,26 @@ const insertOrder = async (data: CreateOrder) => {
 		warehouseId: data.warehouseId,
 	});
 
+	if (!createdOrder) {
+		logger.error.error(`Failed to create order.`);
+		throw new createHttpError.BadRequest(`Failed to create order.`);
+	}
+
 	const orderItemsPromises = data.items.map((item) =>
 		orderItems.service.insertOrderItem({
-			orderId: createdOrder[0].id,
+			orderId: createdOrder.id,
 			productId: item.productId,
 			quantity: item.quantity,
 		})
 	);
+
 	await Promise.all(orderItemsPromises);
+
+	await elasticSearch.service.addToIndex(
+		"orders",
+		createdOrder,
+		String(createdOrder.id)
+	);
 
 	return createdOrder;
 };
@@ -181,6 +262,10 @@ const changeOrderState = async (orderId: number, status: OrderStatus) => {
 		await Promise.all(updateProductsQuantity);
 	}
 
+	await elasticSearch.service.updateIndex("orders", String(orderId), {
+		status: status,
+	});
+
 	const adminUsers = await users.service.findUsersByRole(Role.ADMIN);
 	const sendMailsPromises = adminUsers.map((user) => {
 		mail.service.sendMail({
@@ -213,7 +298,11 @@ const deleteOrder = async (id: number) => {
 
 	await orderItems.service.deleteOrderItem(order.id);
 
-	return await ordersRepository.deleteOrder(id);
+	const deletedOrder = await ordersRepository.deleteOrder(id);
+
+	await elasticSearch.service.deleteFromIndex("orders", String(id));
+
+	return deletedOrder;
 };
 
 export default {

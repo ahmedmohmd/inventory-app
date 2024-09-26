@@ -1,4 +1,5 @@
-import { OrderStatus } from "./orders.enum";
+import { OrderBy } from "../products/products.enum";
+import { OrdersSortKey, OrderStatus } from "./orders.enum";
 
 export type OrderItem = {
 	productId: number;
@@ -22,9 +23,10 @@ export type FindAllOrdersQuery = {
 	page?: number;
 	limit?: number;
 	supplierId?: number;
-	sortBy?: "createdAt" | "total";
-	order?: "asc" | "desc";
+	sortBy?: OrdersSortKey;
+	orderBy?: OrderBy;
 	status?: "pending" | "completed";
+	warehouseId?: number;
 };
 
 export type UpdateOrder = Partial<CreateOrder>;

@@ -5,6 +5,7 @@ import { ENV } from "./config/env";
 import bootstrap from "./src/bootstrap";
 import { connectToDatabase } from "./src/db";
 import logger from "./src/logging";
+import elasticSearch from "./src/elastic-search";
 
 export const app = express();
 app.use(express.json());
@@ -25,6 +26,9 @@ const port = Number(ENV.PORT) || config.defaults.port;
 async function main() {
 	await connectToDatabase();
 	logger.info.info(`connected to database successfully.`);
+
+	// handleelastic search
+	await elasticSearch.service.createAllIndices();
 
 	app.listen(port, () => {
 		logger.info.info(`listening on ${config.apiEndPoint}.`);

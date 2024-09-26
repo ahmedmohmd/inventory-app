@@ -9,6 +9,12 @@ import { validateRequestQuery } from "../common/middleware/validate-request-quer
 const productsRouter = express.Router();
 
 productsRouter.get(
+	"/search",
+	validateRequestQuery(productsValidationSchema.searchProductsQuerySchema),
+	productsController.searchProducts
+);
+
+productsRouter.get(
 	"/",
 	validateRequestQuery(productsValidationSchema.findAllProductsQuerySchema),
 	productsController.getAllProducts

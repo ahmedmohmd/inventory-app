@@ -4,6 +4,7 @@ import { CreateStock, UpdateStock } from "./stocks.types";
 import stocksRepository from "./stocks.repository";
 import products from "../products";
 import warehouses from "../warehouses";
+import { updateProductsByRelatedEntity } from "../common/utils/updateproducts-by-related-entity.util";
 
 /**
  * Retrieves all stock records from the database.
@@ -92,7 +93,17 @@ const updateStock = async (id: number, data: UpdateStock) => {
 		throw new createHttpError.NotFound(`Stock with ID: ${id} not Found.`);
 	}
 
-	return await stocksRepository.updateStock(id, data);
+	const [updatedStock] = await stocksRepository.updateStock(id, data);
+
+	await updateProductsByRelatedEntity(
+		"null",
+		0,
+		null,
+		String(id),
+		updatedStock
+	);
+
+	return updatedStock;
 };
 
 /**

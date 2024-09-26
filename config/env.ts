@@ -46,6 +46,8 @@ const envSchema = z.object({
 	CLOUDINARY_API_KEY: z.string(),
 	CLOUDINARY_API_SECRET: z.string(),
 	REDIS_URL: z.string(),
+	ELASTIC_SEARCH_URL: z.string(),
+	ELASTIC_SEARCH_API_KEY: z.string(),
 });
 
 type Env = z.infer<typeof envSchema>;

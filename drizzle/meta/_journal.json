@@ -169,6 +169,27 @@
 			"when": 1726557600974,
 			"tag": "0023_lazy_doctor_octopus",
 			"breakpoints": true
+		},
+		{
+			"idx": 24,
+			"version": "7",
+			"when": 1727179790557,
+			"tag": "0024_material_baron_strucker",
+			"breakpoints": true
+		},
+		{
+			"idx": 25,
+			"version": "7",
+			"when": 1727180648861,
+			"tag": "0025_lethal_shatterstar",
+			"breakpoints": true
+		},
+		{
+			"idx": 26,
+			"version": "7",
+			"when": 1727180938469,
+			"tag": "0026_sweet_tomorrow_man",
+			"breakpoints": true
 		}
 	]
 }

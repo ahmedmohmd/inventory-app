@@ -13,9 +13,14 @@ import productsRepository from "./products.repository";
 import {
 	CreateProduct,
 	FindAllProductsQuery,
+	SearchProductsQuery,
 	UpdateProduct,
 } from "./products.types";
 import suppliers from "../suppliers";
+import elasticSearch from "../elastic-search";
+import { config } from "../../config/config";
+import stocks from "../stocks";
+import warehouses from "../warehouses";
 
 const MAX_IMAGES = 4;
 
@@ -25,10 +30,169 @@ const MAX_IMAGES = 4;
  * @param {FindAllProductsQuery} query - The query parameters to filter products by.
  * @return {Promise<unknown[]>} An array of products that match the query parameters.
  */
-const findAllProducts = async (query: FindAllProductsQuery) => {
-	const products = await productsRepository.findAllProducts(query);
 
-	return products;
+// ? @deprecated
+// ? Old Implementation of findAllProducts
+//? get all data from main database
+// const findAllProducts = async (query: FindAllProductsQuery) => {
+// 	const products = await productsRepository.findAllProducts(query);
+
+// 	return products;
+// };
+
+const findAllProducts = async (query: FindAllProductsQuery) => {
+	// const products = await productsRepository.findAllProducts(query);
+
+	const currentPage = Number(query.page) || config.pagination.page;
+	const pageSize = Number(query.limit) || config.pagination.limit;
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const elasticQueryOptions: any = {
+		bool: {
+			must: [],
+		},
+	};
+
+	if (query.minPrice || query.maxPrice) {
+		if (!query.minPrice) {
+			elasticQueryOptions.bool.must.push({
+				range: {
+					price: {
+						lte: Number(query.maxPrice),
+					},
+				},
+			});
+		}
+
+		if (!query.maxPrice) {
+			elasticQueryOptions.bool.must.push({
+				range: {
+					price: {
+						gte: Number(query.minPrice),
+					},
+				},
+			});
+		}
+
+		if (query.minPrice && query.maxPrice) {
+			elasticQueryOptions.bool.must.push({
+				range: {
+					price: {
+						gte: Number(query.minPrice),
+						lte: Number(query.maxPrice),
+					},
+				},
+			});
+		}
+	}
+
+	if (query.brand) {
+		elasticQueryOptions.bool.must.push({
+			term: {
+				brand: query.brand,
+			},
+		});
+	}
+
+	if (query.color) {
+		elasticQueryOptions.bool.must.push({
+			term: {
+				color: query.color,
+			},
+		});
+	}
+
+	if (query.status) {
+		elasticQueryOptions.bool.must.push({
+			term: {
+				status: query.status,
+			},
+		});
+	}
+
+	if (query.sectionId) {
+		elasticQueryOptions.bool.must.push({
+			term: {
+				sectionId: Number(query.sectionId),
+			},
+		});
+	}
+
+	if (query.categoryId) {
+		elasticQueryOptions.bool.must.push({
+			term: {
+				categoryId: Number(query.categoryId),
+			},
+		});
+	}
+
+	if (query.supplierId) {
+		elasticQueryOptions.bool.must.push({
+			term: {
+				supplierId: Number(query.supplierId),
+			},
+		});
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const sortOptions: any = [];
+
+	if (query.sortBy) {
+		const sortOrder = query.orderBy === "desc" ? "desc" : "asc";
+
+		if (typeof query.sortBy === "string") {
+			sortOptions.push({
+				[`${query.sortBy}.keyword`]: { order: sortOrder },
+			});
+		} else {
+			sortOptions.push({
+				[query.sortBy]: { order: sortOrder },
+			});
+		}
+	} else {
+		sortOptions.push({
+			"name.keyword": { order: "asc" },
+		});
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const options: any = {
+		index: "products",
+		from: (currentPage - 1) * pageSize,
+		size: pageSize,
+		// filter_path: "hits.hits._source.name",
+		sort: sortOptions,
+	};
+
+	if (elasticQueryOptions.bool.must.length > 0) {
+		options.query = elasticQueryOptions;
+	} else {
+		options.query = {
+			match_all: {},
+		};
+	}
+
+	const result = await elasticSearch.client.search(options);
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const final: any = {};
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const totalCount = result.hits.total ? (result.hits.total as any).value : 0;
+	const totalPages = Math.ceil(totalCount / pageSize);
+	const nextPage = currentPage < totalPages ? currentPage + 1 : null;
+	const prevPage = currentPage > 1 ? currentPage - 1 : null;
+
+	final.data = result.hits ? result?.hits?.hits : [];
+	final.pagination = {
+		total_count: totalCount,
+		total_pages: totalPages,
+		current_page: currentPage,
+		next_page: nextPage,
+		prev_page: prevPage,
+	};
+
+	return final;
 };
 
 /**
@@ -104,6 +268,29 @@ const insertProduct = async (
 
 	const createdProduct = await productsRepository.insertProduct(productData);
 
+	if (!createdProduct) {
+		logger.error.error(
+			`Error while creating product with Name: ${productData.name}.`
+		);
+
+		throw new createHttpError.BadRequest(
+			`Error while creating product with Name: ${productData.name}.`
+		);
+	}
+
+	// Create all empty stocks in al warehouses
+	const fetchedWarehouses = await warehouses.service.findAllWarehouses();
+
+	const createStockspromises = fetchedWarehouses.map((warehouse) =>
+		stocks.service.insertStock({
+			productId: createdProduct.id,
+			warehouseId: warehouse.id,
+			quantity: 0,
+		})
+	);
+
+	await Promise.all(createStockspromises);
+
 	for (const file of images) {
 		const uploadedImage = await uploadImage(file, "products-images"); //eslint-disable-line
 
@@ -115,6 +302,12 @@ const insertProduct = async (
 			});
 		}
 	}
+
+	await elasticSearch.service.addToIndex(
+		"products",
+		(await productsRepository.findProductById(createdProduct.id))!,
+		String(createdProduct.id)
+	);
 
 	return createdProduct;
 };
@@ -135,7 +328,25 @@ const updateProduct = async (id: number, productData: UpdateProduct) => {
 		throw new createHttpError.NotFound(`Product with ID: ${id} not found.`);
 	}
 
-	return await productsRepository.updateProduct(id, productData);
+	const updatedProduct = await productsRepository.updateProduct(
+		id,
+		productData
+	);
+
+	if (!updatedProduct) {
+		logger.error.error(`Error while updating product with ID: ${id}.`);
+
+		throw new createHttpError.BadRequest(
+			`Error while updating product with ID: ${id}.`
+		);
+	}
+
+	await elasticSearch.service.updateIndex("products", String(id), {
+		...productData,
+		updatedAt: updatedProduct.updatedAt,
+	});
+
+	return updatedProduct;
 };
 
 /**
@@ -164,7 +375,181 @@ const deleteProduct = async (id: number) => {
 		await deleteProductScreenshots(product.id);
 	}
 
-	return await productsRepository.deleteProduct(id);
+	const deletedProduct = await productsRepository.deleteProduct(id);
+
+	if (!deletedProduct) {
+		logger.error.error(`Error while deleting product with ID: ${id}.`);
+		throw new createHttpError.BadRequest(
+			`Error while deleting product with ID: ${id}.`
+		);
+	}
+
+	await elasticSearch.service.deleteFromIndex(
+		"products",
+		String(deletedProduct.id)
+	);
+
+	return deletedProduct;
+};
+
+const searchProducts = async (query: SearchProductsQuery) => {
+	const currentPage = Number(query.page) || config.pagination.page;
+	const pageSize = Number(query.limit) || config.pagination.limit;
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const elasticQueryOptions: any = {
+		bool: {
+			must: [
+				{
+					multi_match: {
+						query: query.search || "",
+						fields: ["name", "description"],
+					},
+				},
+			],
+		},
+	};
+
+	if (query.minPrice || query.maxPrice) {
+		if (!query.minPrice) {
+			elasticQueryOptions.bool.must.push({
+				range: {
+					price: {
+						lte: Number(query.maxPrice),
+					},
+				},
+			});
+		}
+
+		if (!query.maxPrice) {
+			elasticQueryOptions.bool.must.push({
+				range: {
+					price: {
+						gte: Number(query.minPrice),
+					},
+				},
+			});
+		}
+
+		if (query.minPrice && query.maxPrice) {
+			elasticQueryOptions.bool.must.push({
+				range: {
+					price: {
+						gte: Number(query.minPrice),
+						lte: Number(query.maxPrice),
+					},
+				},
+			});
+		}
+	}
+
+	if (query.brand) {
+		elasticQueryOptions.bool.must.push({
+			term: {
+				brand: query.brand,
+			},
+		});
+	}
+
+	if (query.color) {
+		elasticQueryOptions.bool.must.push({
+			term: {
+				color: query.color,
+			},
+		});
+	}
+
+	if (query.status) {
+		elasticQueryOptions.bool.must.push({
+			term: {
+				status: query.status,
+			},
+		});
+	}
+
+	if (query.sectionId) {
+		elasticQueryOptions.bool.must.push({
+			term: {
+				sectionId: Number(query.sectionId),
+			},
+		});
+	}
+
+	if (query.categoryId) {
+		elasticQueryOptions.bool.must.push({
+			term: {
+				categoryId: Number(query.categoryId),
+			},
+		});
+	}
+
+	if (query.supplierId) {
+		elasticQueryOptions.bool.must.push({
+			term: {
+				supplierId: Number(query.supplierId),
+			},
+		});
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const sortOptions: any = [];
+
+	if (query.sortBy) {
+		const sortOrder = query.orderBy === "desc" ? "desc" : "asc";
+
+		if (typeof query.sortBy === "string") {
+			sortOptions.push({
+				[`${query.sortBy}.keyword`]: { order: sortOrder },
+			});
+		} else {
+			sortOptions.push({
+				[query.sortBy]: { order: sortOrder },
+			});
+		}
+	} else {
+		sortOptions.push({
+			"name.keyword": { order: "asc" },
+		});
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const options: any = {
+		index: "products",
+		from: (currentPage - 1) * pageSize,
+		size: pageSize,
+		// filter_path: "hits.hits._source.name",
+		sort: sortOptions,
+	};
+
+	if (elasticQueryOptions.bool.must.length > 0) {
+		options.query = elasticQueryOptions;
+	} else {
+		options.query = {
+			match_all: {},
+		};
+	}
+
+	const result = await elasticSearch.client.search(options);
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const final: any = {};
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const totalCount = result.hits.total ? (result.hits.total as any).value : 0;
+	const totalPages = Math.ceil(totalCount / pageSize);
+	const nextPage = currentPage < totalPages ? currentPage + 1 : null;
+	const prevPage = currentPage > 1 ? currentPage - 1 : null;
+
+	final.data = result.hits ? result?.hits?.hits : [];
+	final.pagination = {
+		total_count: totalCount,
+		total_pages: totalPages,
+		current_page: currentPage,
+		next_page: nextPage,
+		prev_page: prevPage,
+	};
+
+	return final;
 };
 
 export default {
@@ -173,4 +558,5 @@ export default {
 	insertProduct,
 	updateProduct,
 	deleteProduct,
+	searchProducts,
 };

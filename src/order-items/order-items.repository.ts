@@ -9,10 +9,23 @@ import { CreateOrderItem } from "./order-items.types";
  * @param {CreateOrderItem} data - The order item data to be inserted.
  * @return {Promise} A promise that resolves with the inserted order item.
  */
-const insertOrderItem = (data: CreateOrderItem) => {
-	return db.insert(orderItems).values(data).returning();
-};
+const insertOrderItem = async (data: CreateOrderItem) => {
+	const [createdOrderItem] = await db
+		.insert(orderItems)
+		.values(data)
+		.returning();
 
+	const orderItem = await db.query.orderItems.findFirst({
+		where: eq(orderItems.id, createdOrderItem.id),
+
+		with: {
+			product: true,
+			// order: true,
+		},
+	});
+
+	return orderItem;
+};
 /**
  * Deletes an order item from the database.
  *

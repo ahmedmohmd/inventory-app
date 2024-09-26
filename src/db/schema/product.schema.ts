@@ -21,20 +21,58 @@ export const productStatus = pgEnum("product_status", [
 	"damaged",
 ]);
 
+export const productColors = pgEnum("product_colors", [
+	"blue",
+	"red",
+	"green",
+	"gray",
+	"black",
+	"white",
+	"orange",
+	"yellow",
+	"purple",
+]);
+
+export const productBrands = pgEnum("product_brands", [
+	"apple",
+	"asus",
+	"hp",
+	"lenovo",
+	"microsoft",
+	"nokia",
+	"sony",
+	"toshiba",
+	"xiaomi",
+	"acer",
+	"alienware",
+	"msi",
+	"razer",
+	"lg",
+	"nvidia",
+]);
+
 export const products = pgTable("products", {
 	id: serial("id").primaryKey(),
+
 	name: varchar("name", {
 		length: 25,
 	}).notNull(),
+
 	description: varchar("description", {
 		length: 255,
 	}),
+
 	price: integer("price").notNull(),
+
 	status: productStatus("status"),
 
 	sku: varchar("sku", {
 		length: 25,
 	}).notNull(),
+
+	color: productColors("color").notNull(),
+
+	brand: productBrands("brand").notNull(),
 
 	categoryId: integer("categoryId")
 		.references(() => categories.id, {

@@ -33,8 +33,9 @@ const findAllOrdersQuerySchema = z.object({
 	page: z.string().regex(/^\d+$/).optional(),
 	supplierId: z.string().regex(/^\d+$/).optional(),
 	sortBy: OrdersQuerySortBySchema.optional(),
-	order: OrdersQueryOrder.optional(),
+	orderBy: OrdersQueryOrder.optional(),
 	status: OrderQueryStatus.optional(),
+	warehouseId: z.string().regex(/^\d+$/).optional(),
 });
 
 export default {

@@ -2,6 +2,7 @@ import createHttpError from "http-errors";
 import categoriesRepository from "./categories.repository";
 import { CreateCategory, UpdateCategory } from "./categories.types";
 import logger from "../logging";
+import { updateProductsByRelatedEntity } from "../common/utils/updateproducts-by-related-entity.util";
 
 /**
  * Retrieves a category by its ID.
@@ -64,7 +65,11 @@ const updateCategory = async (id: number, data: UpdateCategory) => {
 		throw new createHttpError.NotFound(`Category with ID: ${id} not found.`);
 	}
 
-	return await categoriesRepository.updateCategory(id, data);
+	const [updatedCategory] = await categoriesRepository.updateCategory(id, data);
+
+	await updateProductsByRelatedEntity("category", id, updatedCategory);
+
+	return updatedCategory;
 };
 
 /**

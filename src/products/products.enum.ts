@@ -1,6 +1,7 @@
 enum SortBy {
 	PRICE = "price",
-	QUANTITY = "qty",
+	// QUANTITY = "qty",
+	NAME = "name",
 }
 
 enum OrderBy {

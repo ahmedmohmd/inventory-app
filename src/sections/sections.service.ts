@@ -2,6 +2,7 @@ import createHttpError from "http-errors";
 import { CreateSection, UpdateSection } from "./section.types";
 import sectionsRepository from "./sections.repository";
 import logger from "../logging";
+import { updateProductsByRelatedEntity } from "../common/utils/updateproducts-by-related-entity.util";
 
 /**
  * Retrieves all sections from the database.
@@ -67,7 +68,11 @@ const updateSection = async (id: number, data: UpdateSection) => {
 		throw new createHttpError.NotFound(`Section with ID: ${id} not Found.`);
 	}
 
-	return await sectionsRepository.updateSection(id, data);
+	const [updatedSection] = await sectionsRepository.updateSection(id, data);
+
+	await updateProductsByRelatedEntity("section", id, updateSection);
+
+	return updatedSection;
 };
 
 /**

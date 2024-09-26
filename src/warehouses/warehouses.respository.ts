@@ -43,7 +43,9 @@ const findWarehouseByName = async (name: string) => {
  * @return {object} The newly inserted warehouse object
  */
 const insertWarehouse = async (data: CreateWarehouse) => {
-	return await db.insert(warehouses).values(data).returning();
+	const [warehouse] = await db.insert(warehouses).values(data).returning();
+
+	return warehouse;
 };
 
 /**
@@ -54,11 +56,13 @@ const insertWarehouse = async (data: CreateWarehouse) => {
  * @return {object} The updated warehouse object
  */
 const updateWarehouse = async (id: number, data: UpdateWarehouse) => {
-	return await db
+	const [warehouse] = await db
 		.update(warehouses)
 		.set(data)
 		.where(eq(warehouses.id, id))
 		.returning();
+
+	return warehouse;
 };
 
 /**
