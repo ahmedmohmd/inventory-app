@@ -14,6 +14,14 @@ const getAllProducts: RequestHandler = async ({ query }, res) => {
 	return res.status(StatusCodes.OK).json(products);
 };
 
+const productsAutocomplete: RequestHandler = async (req, res) => {
+	const { search } = req.query;
+
+	const products = await productsService.productsAutocomplete(search as string);
+
+	return res.status(StatusCodes.OK).json(products);
+};
+
 /**
  * Retrieves a product by its ID.
  *
@@ -96,4 +104,5 @@ export default {
 	updateProduct,
 	deleteProduct,
 	searchProducts,
+	productsAutocomplete,
 };

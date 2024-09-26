@@ -107,10 +107,15 @@ const searchProductsQuerySchema = z.object({
 	search: z.string(),
 });
 
+const productsAutocompleteSchema = z.object({
+	search: z.string(),
+});
+
 export default {
 	createProductSchema,
 	productIdSchema,
 	updateProductSchema,
 	findAllProductsQuerySchema,
 	searchProductsQuerySchema,
+	productsAutocompleteSchema,
 };

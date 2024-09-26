@@ -15,6 +15,12 @@ productsRouter.get(
 );
 
 productsRouter.get(
+	"/autocomplete",
+	validateRequestQuery(productsValidationSchema.productsAutocompleteSchema),
+	productsController.productsAutocomplete
+);
+
+productsRouter.get(
 	"/",
 	validateRequestQuery(productsValidationSchema.findAllProductsQuerySchema),
 	productsController.getAllProducts

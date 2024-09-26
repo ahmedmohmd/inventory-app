@@ -17,6 +17,9 @@ const productsIndex = {
 						type: "keyword",
 						ignore_above: 256,
 					},
+					completion: {
+						type: "completion",
+					},
 				},
 			},
 
@@ -64,12 +67,10 @@ const productsIndex = {
 
 			createdAt: {
 				type: "date",
-				format: "yyyy-MM-dd HH:mm:ss",
 			},
 
 			updatedAt: {
 				type: "date",
-				format: "yyyy-MM-dd HH:mm:ss",
 			},
 		},
 	},

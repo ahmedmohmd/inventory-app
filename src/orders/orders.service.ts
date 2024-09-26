@@ -99,7 +99,7 @@ const findAllOrders = async (query: FindAllOrdersQuery) => {
 	const nextPage = currentPage < totalPages ? currentPage + 1 : null;
 	const prevPage = currentPage > 1 ? currentPage - 1 : null;
 
-	final.data = result.hits ? result?.hits?.hits : [];
+	final.data = result.hits ? result?.hits?.hits.map((hit) => hit._source) : [];
 	final.pagination = {
 		total_count: totalCount,
 		total_pages: totalPages,

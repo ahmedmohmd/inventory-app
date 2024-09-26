@@ -28,26 +28,13 @@ const MAX_IMAGES = 4;
  * Retrieves a list of products based on the provided query parameters.
  *
  * @param {FindAllProductsQuery} query - The query parameters to filter products by.
- * @return {Promise<unknown[]>} An array of products that match the query parameters.
+ * @return {object} An object containing the filtered products and pagination metadata.
  */
-
-// ? @deprecated
-// ? Old Implementation of findAllProducts
-//? get all data from main database
-// const findAllProducts = async (query: FindAllProductsQuery) => {
-// 	const products = await productsRepository.findAllProducts(query);
-
-// 	return products;
-// };
-
 const findAllProducts = async (query: FindAllProductsQuery) => {
-	// const products = await productsRepository.findAllProducts(query);
-
 	const currentPage = Number(query.page) || config.pagination.page;
 	const pageSize = Number(query.limit) || config.pagination.limit;
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const elasticQueryOptions: any = {
+	const elasticQueryOptions: { bool: { must: Record<string, unknown>[] } } = {
 		bool: {
 			must: [],
 		},
@@ -134,8 +121,7 @@ const findAllProducts = async (query: FindAllProductsQuery) => {
 		});
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const sortOptions: any = [];
+	const sortOptions: Record<string, { order: "asc" | "desc" }>[] = [];
 
 	if (query.sortBy) {
 		const sortOrder = query.orderBy === "desc" ? "desc" : "asc";
@@ -155,12 +141,10 @@ const findAllProducts = async (query: FindAllProductsQuery) => {
 		});
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const options: any = {
+	const options: Record<string, object | string | number> = {
 		index: "products",
 		from: (currentPage - 1) * pageSize,
 		size: pageSize,
-		// filter_path: "hits.hits._source.name",
 		sort: sortOptions,
 	};
 
@@ -174,16 +158,16 @@ const findAllProducts = async (query: FindAllProductsQuery) => {
 
 	const result = await elasticSearch.client.search(options);
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const final: any = {};
+	const final: Record<string, object | string | number> = {};
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const totalCount = result.hits.total ? (result.hits.total as any).value : 0;
+	const totalCount = result.hits.total
+		? (result.hits.total as { value: number }).value
+		: 0;
 	const totalPages = Math.ceil(totalCount / pageSize);
 	const nextPage = currentPage < totalPages ? currentPage + 1 : null;
 	const prevPage = currentPage > 1 ? currentPage - 1 : null;
 
-	final.data = result.hits ? result?.hits?.hits : [];
+	final.data = result.hits ? result?.hits?.hits.map((hit) => hit._source) : [];
 	final.pagination = {
 		total_count: totalCount,
 		total_pages: totalPages,
@@ -396,8 +380,7 @@ const searchProducts = async (query: SearchProductsQuery) => {
 	const currentPage = Number(query.page) || config.pagination.page;
 	const pageSize = Number(query.limit) || config.pagination.limit;
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const elasticQueryOptions: any = {
+	const elasticQueryOptions: { bool: { must: Record<string, unknown>[] } } = {
 		bool: {
 			must: [
 				{
@@ -491,8 +474,7 @@ const searchProducts = async (query: SearchProductsQuery) => {
 		});
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const sortOptions: any = [];
+	const sortOptions: Record<string, { order: "asc" | "desc" }>[] = [];
 
 	if (query.sortBy) {
 		const sortOrder = query.orderBy === "desc" ? "desc" : "asc";
@@ -512,12 +494,10 @@ const searchProducts = async (query: SearchProductsQuery) => {
 		});
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const options: any = {
+	const options: Record<string, object | string | number> = {
 		index: "products",
 		from: (currentPage - 1) * pageSize,
 		size: pageSize,
-		// filter_path: "hits.hits._source.name",
 		sort: sortOptions,
 	};
 
@@ -531,16 +511,16 @@ const searchProducts = async (query: SearchProductsQuery) => {
 
 	const result = await elasticSearch.client.search(options);
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const final: any = {};
+	const final: Record<string, object | string | number> = {};
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const totalCount = result.hits.total ? (result.hits.total as any).value : 0;
+	const totalCount = result.hits.total
+		? (result.hits.total as { value: number }).value
+		: 0;
 	const totalPages = Math.ceil(totalCount / pageSize);
 	const nextPage = currentPage < totalPages ? currentPage + 1 : null;
 	const prevPage = currentPage > 1 ? currentPage - 1 : null;
 
-	final.data = result.hits ? result?.hits?.hits : [];
+	final.data = result.hits ? result?.hits?.hits.map((hit) => hit._source) : [];
 	final.pagination = {
 		total_count: totalCount,
 		total_pages: totalPages,
@@ -552,6 +532,32 @@ const searchProducts = async (query: SearchProductsQuery) => {
 	return final;
 };
 
+const productsAutocomplete = async (query: string) => {
+	const result = await elasticSearch.client.search({
+		index: "products",
+		body: {
+			suggest: {
+				product_suggestions: {
+					prefix: query,
+					completion: {
+						field: "name.completion",
+						size: 1,
+					},
+				},
+			},
+		},
+		filter_path: "suggest.product_suggestions.options.text",
+	});
+
+	if (result.suggest) {
+		return (
+			result.suggest.product_suggestions[0].options as { text: string }[]
+		).map((option: { text: string }) => option.text);
+	}
+
+	return [];
+};
+
 export default {
 	findAllProducts,
 	findProductById,
@@ -559,4 +565,5 @@ export default {
 	updateProduct,
 	deleteProduct,
 	searchProducts,
+	productsAutocomplete,
 };
