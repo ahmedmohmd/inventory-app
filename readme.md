@@ -12,6 +12,10 @@ Inventory Management API built with Node.js and TypeScript, providing comprehens
 4. Logging with **rotation** Fetaure thanks to Winston.
 5. Awesome performance for Database operations thanks to **Drizzle**.
 6. Easy to start as a container with **Doecker** and **docker-compose**.
+7. Autocomplete thaks to **Elasticsearch**.
+8. High performance and small latency thanks to using **Redis**.
+9. Full customizable filtering and searching feature thanks to **Elasticsearch**.
+10. Full power of charts to get valuabe info thanks to **Kibana**
 
 ## 🛠️ Tech Stack
 
@@ -24,6 +28,10 @@ Inventory Management API built with Node.js and TypeScript, providing comprehens
 - **Multer** as mail library with **Gamil** as Mail Provider
 - **Winston** as logging library (with rotation feature)
 - **Swagger** as Docs Solution
+- **Elasticsearch** as a Search Engine and Logging storage.
+- **Redis** as Caching slution.
+- **Kibana** to work with collected data in **Elasticsearch**.
+- **logstash** as data processing pipeline.
 
 ## 🏗️ Architecture
 
