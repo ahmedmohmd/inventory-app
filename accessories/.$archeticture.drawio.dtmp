@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.7.8 Chrome/128.0.6613.36 Electron/32.0.1 Safari/537.36" version="24.7.8">
   <diagram name="Page-1" id="vwp1jZDT_qWsAFFD4D8j">
-    <mxGraphModel dx="3697" dy="2526" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="847" dy="769" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -413,6 +413,9 @@
         </mxCell>
         <mxCell id="Xkq9Ce1LSImj8d6u1P5A-8" value="Kibana" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontFamily=Helvetica;fontSize=24;fontStyle=1" vertex="1" parent="1">
           <mxGeometry x="4322.15" y="2950" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="Xkq9Ce1LSImj8d6u1P5A-9" value="&lt;span style=&quot;font-family: Helvetica; font-size: 17px; font-weight: 700; text-wrap: wrap;&quot;&gt;/logs/&amp;lt;level&amp;gt;&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;" vertex="1" parent="1">
+          <mxGeometry x="3540" y="3055" width="130" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
