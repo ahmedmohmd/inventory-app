@@ -155,6 +155,36 @@ CLOUDINARY_API_SECRET: string;
 6. Products have at least 4 screenshots
 7. Users can reset his password
 
+## 🏋️ Challanges
+
+- **Relations in Elastic Search**
+
+  💪 **Problem**
+
+       I am using **Postgres** as my primary database, which follows a relational model. This has presented challenges when mapping my relational tables into **Elasticsearch** indexes since **Elasticsearch** is not designed to handle complex relationships natively.
+
+  💡 **Solution**
+
+       I explored two potential solutions:
+
+            1. **Embed Documents in Elasticsearch Directly:**
+                Initially, I tried embedding related documents directly in **Elasticsearch**, which seemed like a good solution at first, but I encountered some issues later.
+
+            2. **Separate Each Table into Its Own Index:**
+                I then removed the embedded documents and created individual indexes for specific tables.
+
+  🤔 **Why**
+
+  When I first chose the embedding approach, I used **Elasticsearch** scripts to keep the embedded children and their fields synchronized with the main database. This worked fine initially, but as the data grew more complex, issues started to arise. Tables with deeply nested children—often spanning more than one level—became difficult to manage. For instance, the `products` table had an array of children, which made synchronizing the data between **Elasticsearch** and the main database increasingly complicated.
+
+  As a result, I shifted to a different solution. I created separate indexes for just the `products` and `orders` tables, adding only the essential data to these indexes, while keeping the rest of the tables in the main database.
+
+  For search operations like `findAll` and `search`, I fetch data from these **Elasticsearch** indexes. However, for more granular methods like `findOne`, I left them as-is in the main database, as there would be no significant advantage in moving these queries to **Elasticsearch**.
+
+  What about the embedded documents and relations? I decided to discard them. I realized that when retrieving products and related tables, they are often returned as arrays of items. In most cases, I don’t need all the detailed data upfront. Basic information suffices for listing pages, and I can fetch the full details for each item on its dedicated page, directly from the main database.
+
+  This solution allows me to implement efficient **Search** and **Filtering** features with minimal effort, while avoiding the complexities of deeply nested relationships in **Elasticsearch**.
+
 ## 🏠 Offecial Project's Home Page
 
 [Inventory App](https://ahmedmohmd.vercel.app/projects/inventory-app)
