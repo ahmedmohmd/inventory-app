@@ -2,7 +2,8 @@ import createHttpError from "http-errors";
 import categoriesRepository from "./categories.repository";
 import { CreateCategory, UpdateCategory } from "./categories.types";
 import logger from "../logging";
-import { updateProductsByRelatedEntity } from "../common/utils/updateproducts-by-related-entity.util";
+import handleCache from "../common/utils/handle-cache.util";
+import cache from "../cache";
 
 /**
  * Retrieves a category by its ID.
@@ -11,7 +12,10 @@ import { updateProductsByRelatedEntity } from "../common/utils/updateproducts-by
  * @return {object} The category object if found, otherwise throws a NotFound error.
  */
 const findCategoryById = async (id: number) => {
-	const category = await categoriesRepository.findCategoryById(id);
+	const category = await handleCache(
+		`category:${id}`,
+		async () => await categoriesRepository.findCategoryById(id)
+	);
 
 	if (!category) {
 		logger.error.error(`Category with ID: ${id} not found.`);
@@ -27,7 +31,15 @@ const findCategoryById = async (id: number) => {
  * @return {object[]} An array of category objects.
  */
 const findAllCategories = async () => {
-	return await categoriesRepository.findAllCategories();
+	const CACHE_DURATION = 2592000;
+
+	const categories = await handleCache(
+		`categories`,
+		categoriesRepository.findAllCategories,
+		CACHE_DURATION
+	);
+
+	return categories;
 };
 
 /**
@@ -67,7 +79,11 @@ const updateCategory = async (id: number, data: UpdateCategory) => {
 
 	const [updatedCategory] = await categoriesRepository.updateCategory(id, data);
 
-	await updateProductsByRelatedEntity("category", id, updatedCategory);
+	await cache.service.removeFromCache(`category:${id}`);
+	await cache.service.addToCache(
+		`category:${id}`,
+		JSON.stringify(updatedCategory)
+	);
 
 	return updatedCategory;
 };
@@ -86,7 +102,11 @@ const deleteCategory = async (id: number) => {
 		throw new createHttpError.NotFound(`Category with ID: ${id} not found )`);
 	}
 
-	return await categoriesRepository.deleteCategory(id);
+	const deletedCategory = await categoriesRepository.deleteCategory(id);
+
+	await cache.service.removeFromCache(`category:${id}`);
+
+	return deletedCategory;
 };
 
 export default {

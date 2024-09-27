@@ -10,7 +10,7 @@ import cache from "../../cache";
  */
 const handleCache = async (
 	key: string,
-	fetchFromDb: () => Promise<object | null | undefined>,
+	fetchFromDb: () => Promise<any | any[]>, // eslint-disable-line
 	duration: number = config.caching.duration
 ) => {
 	const targetFromCache = await cache.service.getFromCache(key);

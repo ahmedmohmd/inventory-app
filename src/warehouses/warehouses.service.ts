@@ -37,7 +37,7 @@ const findWarehouseById = async (id: number) => {
 		throw new createHttpError.NotFound(`Warehouse with ID: ${id} not Found.`);
 	}
 
-	return await warehousesRespository.findWarehouseById(id);
+	return warehouse;
 };
 
 /**

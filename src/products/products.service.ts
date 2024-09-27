@@ -21,6 +21,8 @@ import elasticSearch from "../elastic-search";
 import { config } from "../../config/config";
 import stocks from "../stocks";
 import warehouses from "../warehouses";
+import handleCache from "../common/utils/handle-cache.util";
+import cache from "../cache";
 
 const MAX_IMAGES = 4;
 
@@ -156,7 +158,10 @@ const findAllProducts = async (query: FindAllProductsQuery) => {
 		};
 	}
 
-	const result = await elasticSearch.client.search(options);
+	const result = await handleCache(
+		`products:${JSON.stringify(options)}`,
+		async () => await elasticSearch.client.search(options)
+	);
 
 	const final: Record<string, object | string | number> = {};
 
@@ -186,7 +191,10 @@ const findAllProducts = async (query: FindAllProductsQuery) => {
  * @return {Promise<unknown>} The product data, or throws a NotFound error if not found.
  */
 const findProductById = async (id: number) => {
-	const product = await productsRepository.findProductById(id);
+	const product = await handleCache(
+		`product:${id}`,
+		async () => await productsRepository.findProductById(id)
+	);
 
 	if (!product) {
 		logger.error.error(`Product with ID: ${id} not found.`);
@@ -330,6 +338,12 @@ const updateProduct = async (id: number, productData: UpdateProduct) => {
 		updatedAt: updatedProduct.updatedAt,
 	});
 
+	await cache.service.removeFromCache(`product:${id}`);
+	await cache.service.addToCache(
+		`product:${id}`,
+		JSON.stringify(updatedProduct)
+	);
+
 	return updatedProduct;
 };
 
@@ -372,6 +386,8 @@ const deleteProduct = async (id: number) => {
 		"products",
 		String(deletedProduct.id)
 	);
+
+	await cache.service.removeFromCache(`product:${id}`);
 
 	return deletedProduct;
 };
@@ -509,7 +525,10 @@ const searchProducts = async (query: SearchProductsQuery) => {
 		};
 	}
 
-	const result = await elasticSearch.client.search(options);
+	const result = await handleCache(
+		`products-search:${JSON.stringify(options)}`,
+		async () => await elasticSearch.client.search(options)
+	);
 
 	const final: Record<string, object | string | number> = {};
 

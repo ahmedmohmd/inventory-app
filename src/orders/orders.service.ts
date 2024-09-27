@@ -12,6 +12,8 @@ import users from "../users";
 import { Role } from "../common/enums/user-role.enum";
 import { ENV } from "../../config/env";
 import elasticSearch from "../elastic-search";
+import handleCache from "../common/utils/handle-cache.util";
+import cache from "../cache";
 
 /**
  * Retrieves a list of orders based on the provided query parameters.
@@ -88,7 +90,10 @@ const findAllOrders = async (query: FindAllOrdersQuery) => {
 		};
 	}
 
-	const result = await elasticSearch.client.search(options);
+	const result = await handleCache(
+		`orders:${JSON.stringify(options)}`,
+		async () => await elasticSearch.client.search(options)
+	);
 
 	const final: Record<string, object | string | number> = {};
 
@@ -118,7 +123,10 @@ const findAllOrders = async (query: FindAllOrdersQuery) => {
  * @return {Promise<Order>} A promise that resolves to the found order, or throws a NotFound error if the order is not found.
  */
 const findOrderById = async (id: number) => {
-	const order = await ordersRepository.findOrderById(id);
+	const order = await handleCache(
+		`order:${id}`,
+		async () => await ordersRepository.findOrderById(id)
+	);
 
 	if (!order) {
 		logger.error.error(`Order with ID: ${id} not found.`);
@@ -140,6 +148,7 @@ const insertOrder = async (data: CreateOrder) => {
 	const productPromises = data.items.map((item) =>
 		productsModule.service.findProductById(item.productId)
 	);
+
 	const products = await Promise.all(productPromises);
 
 	let totalMoney = 0;
@@ -266,6 +275,9 @@ const changeOrderState = async (orderId: number, status: OrderStatus) => {
 		status: status,
 	});
 
+	await cache.service.removeFromCache(`order:${orderId}`);
+	await cache.service.addToCache(`order:${orderId}`, JSON.stringify(order));
+
 	const adminUsers = await users.service.findUsersByRole(Role.ADMIN);
 	const sendMailsPromises = adminUsers.map((user) => {
 		mail.service.sendMail({
@@ -301,6 +313,7 @@ const deleteOrder = async (id: number) => {
 	const deletedOrder = await ordersRepository.deleteOrder(id);
 
 	await elasticSearch.service.deleteFromIndex("orders", String(id));
+	await cache.service.removeFromCache(`order:${id}`);
 
 	return deletedOrder;
 };

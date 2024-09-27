@@ -2,7 +2,8 @@ import createHttpError from "http-errors";
 import { CreateSection, UpdateSection } from "./section.types";
 import sectionsRepository from "./sections.repository";
 import logger from "../logging";
-import { updateProductsByRelatedEntity } from "../common/utils/updateproducts-by-related-entity.util";
+import handleCache from "../common/utils/handle-cache.util";
+import cache from "../cache";
 
 /**
  * Retrieves all sections from the database.
@@ -10,7 +11,18 @@ import { updateProductsByRelatedEntity } from "../common/utils/updateproducts-by
  * @return {Promise<Section[]>} A promise resolving to an array of sections
  */
 const findAllSections = async () => {
-	return await sectionsRepository.findAllSections();
+	const MINUTES = 60;
+	const SECONDS = 60;
+	const HOURS = SECONDS * MINUTES;
+	const CACHE_DURATION = SECONDS * MINUTES * HOURS;
+
+	const sections = await handleCache(
+		`sections`,
+		sectionsRepository.findAllSections,
+		CACHE_DURATION
+	);
+
+	return sections;
 };
 
 /**
@@ -20,7 +32,10 @@ const findAllSections = async () => {
  * @return {Promise<object>} The section object if found, otherwise throws an error
  */
 const findSectionById = async (id: number) => {
-	const section = await sectionsRepository.findSectionById(id);
+	const section = await handleCache(
+		`section:${id}`,
+		async () => await sectionsRepository.findSectionById(id)
+	);
 
 	if (!section) {
 		logger.error.error(`Section with ID: ${id} not Found.`);
@@ -28,7 +43,7 @@ const findSectionById = async (id: number) => {
 		throw new createHttpError.NotFound(`Section with ID: ${id} not Found.`);
 	}
 
-	return await sectionsRepository.findSectionById(id);
+	return section;
 };
 
 /**
@@ -70,7 +85,11 @@ const updateSection = async (id: number, data: UpdateSection) => {
 
 	const [updatedSection] = await sectionsRepository.updateSection(id, data);
 
-	await updateProductsByRelatedEntity("section", id, updateSection);
+	await cache.service.removeFromCache(`section:${id}`);
+	await cache.service.addToCache(
+		`section:${id}`,
+		JSON.stringify(updatedSection)
+	);
 
 	return updatedSection;
 };
@@ -91,7 +110,11 @@ const deleteSection = async (id: number) => {
 		throw new createHttpError.NotFound(`Section with ID: ${id} not Found.`);
 	}
 
-	return await sectionsRepository.deleteSection(id);
+	const deletedProduct = await sectionsRepository.deleteSection(id);
+
+	await cache.service.removeFromCache(`section:${id}`);
+
+	return deletedProduct;
 };
 
 export default {

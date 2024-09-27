@@ -4,7 +4,8 @@ import { CreateStock, UpdateStock } from "./stocks.types";
 import stocksRepository from "./stocks.repository";
 import products from "../products";
 import warehouses from "../warehouses";
-import { updateProductsByRelatedEntity } from "../common/utils/updateproducts-by-related-entity.util";
+import handleCache from "../common/utils/handle-cache.util";
+import cache from "../cache";
 
 /**
  * Retrieves all stock records from the database.
@@ -12,7 +13,9 @@ import { updateProductsByRelatedEntity } from "../common/utils/updateproducts-by
  * @return {Promise} A promise that resolves to an array of stock records
  */
 const findAllStocks = async () => {
-	return await stocksRepository.findAllStocks();
+	const stocks = await handleCache(`stocks`, stocksRepository.findAllStocks);
+
+	return stocks;
 };
 
 /**
@@ -22,7 +25,10 @@ const findAllStocks = async () => {
  * @return {object} The stock record object with the matching ID
  */
 const findStockById = async (id: number) => {
-	const stock = await stocksRepository.findStockById(id);
+	const stock = await handleCache(
+		`stock:${id}`,
+		async () => await stocksRepository.findStockById(id)
+	);
 
 	if (!stock) {
 		logger.error.error(`Stock with ID: ${id} not Found.`);
@@ -30,7 +36,7 @@ const findStockById = async (id: number) => {
 		throw new createHttpError.NotFound(`Stock with ID: ${id} not Found.`);
 	}
 
-	return await stocksRepository.findStockById(id);
+	return stock;
 };
 
 /**
@@ -95,13 +101,8 @@ const updateStock = async (id: number, data: UpdateStock) => {
 
 	const [updatedStock] = await stocksRepository.updateStock(id, data);
 
-	await updateProductsByRelatedEntity(
-		"null",
-		0,
-		null,
-		String(id),
-		updatedStock
-	);
+	await cache.service.removeFromCache(`stock:${id}`);
+	await cache.service.addToCache(`stock:${id}`, JSON.stringify(updatedStock));
 
 	return updatedStock;
 };
@@ -114,7 +115,13 @@ const updateStock = async (id: number, data: UpdateStock) => {
  * @return {object} The stock record object with the matching product ID and warehouse ID, or null if not found
  */
 const findStockByAllParams = async (productId: number, warehouseId: number) => {
-	return await stocksRepository.findStockByAllParams(productId, warehouseId);
+	const stock = await handleCache(
+		`stock:${productId}:${warehouseId}`,
+		async () =>
+			await stocksRepository.findStockByAllParams(productId, warehouseId)
+	);
+
+	return stock;
 };
 
 /**
@@ -133,7 +140,11 @@ const deleteStock = async (id: number) => {
 		throw new createHttpError.NotFound(`Stock with ID: ${id} not Found.`);
 	}
 
-	return await stocksRepository.deleteStock(id);
+	const deletedProduct = await stocksRepository.deleteStock(id);
+
+	await cache.service.removeFromCache(`stock:${id}`);
+
+	return deletedProduct;
 };
 
 export default {

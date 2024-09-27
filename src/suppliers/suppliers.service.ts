@@ -3,7 +3,8 @@ import suppliersRepository from "./suppliers.repository";
 import { CreateSupplier, FindAllSuppliersQuery } from "./suppliers.types";
 import { config } from "../../config/config";
 import logger from "../logging";
-import { updateProductsByRelatedEntity } from "../common/utils/updateproducts-by-related-entity.util";
+import handleCache from "../common/utils/handle-cache.util";
+import cache from "../cache";
 
 /**
  * Retrieves a list of all suppliers with pagination.
@@ -12,7 +13,10 @@ import { updateProductsByRelatedEntity } from "../common/utils/updateproducts-by
  * @return {Promise<object>} A promise that resolves to an object containing the supplier data and pagination information.
  */
 const findAllSuppliers = async (query: FindAllSuppliersQuery) => {
-	const suppliers = await suppliersRepository.findAllSuppliers(query);
+	const suppliers = await handleCache(
+		`suppliers:${JSON.stringify(query)}`,
+		async () => await suppliersRepository.findAllSuppliers(query)
+	);
 
 	const currentPage = Number(query.page) || config.pagination.page;
 	const pageSize = Number(query.limit) || config.pagination.limit;
@@ -42,7 +46,10 @@ const findAllSuppliers = async (query: FindAllSuppliersQuery) => {
  * @return {Promise<object>} The supplier object if found, otherwise throws a NotFound error.
  */
 const findSupplierById = async (id: number) => {
-	const supplier = await suppliersRepository.findSupplierById(id);
+	const supplier = await handleCache(
+		`supplier:${id}`,
+		async () => await suppliersRepository.findSupplierById(id)
+	);
 
 	if (!supplier) {
 		logger.error.error(`Supplier with Id: ${id} not Found.`);
@@ -91,7 +98,11 @@ const updateSupplier = async (id: number, data: CreateSupplier) => {
 
 	const [updatedSupplier] = await suppliersRepository.updateSupplier(id, data);
 
-	await updateProductsByRelatedEntity("supplier", id, updatedSupplier);
+	await cache.service.removeFromCache(`supplier:${id}`);
+	await cache.service.addToCache(
+		`supplier:${id}`,
+		JSON.stringify(updatedSupplier)
+	);
 
 	return updatedSupplier;
 };
@@ -111,7 +122,11 @@ const deleteSupplier = async (id: number) => {
 		throw new createHttpError.NotFound(`Supplier with Id: ${id} not Found.`);
 	}
 
-	return await suppliersRepository.deleteSupplier(id);
+	const deletedSupplier = await suppliersRepository.deleteSupplier(id);
+
+	await cache.service.removeFromCache(`supplier:${id}`);
+
+	return deletedSupplier;
 };
 
 export default {
