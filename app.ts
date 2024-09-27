@@ -17,6 +17,9 @@ bootstrap.handleSecurity(app);
 bootstrap.handleRateLimiting(app);
 bootstrap.handleSwaggerDocs(app);
 
+// Hanldle Access logs
+bootstrap.handleAcessLogs(app);
+
 // All App Routes
 bootstrap.handleRoutes(app);
 

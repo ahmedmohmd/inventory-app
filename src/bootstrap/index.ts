@@ -1,6 +1,7 @@
 import { migrateDatabase } from "../db/migrate";
 import handleCompression from "./compression";
 import handleCors from "./cors";
+import handleAcessLogs from "./handle-access-logs";
 import handleRateLimiting from "./rate-limiting";
 import { handleRoutes } from "./routes";
 import handleSecurity from "./security";
@@ -14,4 +15,5 @@ export default {
 	handleSecurity,
 	handleSwaggerDocs,
 	migrateDatabase,
+	handleAcessLogs,
 };
